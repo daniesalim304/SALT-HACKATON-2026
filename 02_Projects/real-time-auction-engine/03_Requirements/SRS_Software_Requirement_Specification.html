@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>SOFTWARE REQUIREMENT SPECIFICATION - Real-Time Luxury Auction Engine</title>
+  <style>
+  @page {
+    size: A4;
+    margin: 18mm 15mm 20mm 15mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Document Title & Cover Header */
+  .doc-header-banner {
+    border-bottom: 3px solid #e11d48;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .doc-title-main {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+  }
+  .doc-subtitle {
+    font-size: 13pt;
+    font-weight: 600;
+    color: #e11d48;
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
+  .doc-category {
+    font-size: 10pt;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  h1 { display: none; } /* Replaced by custom header */
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 5px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  ul, ol {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 8pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 5px;
+    font-size: 7.5pt;
+    line-height: 1.35;
+    overflow-x: auto;
+    page-break-inside: avoid;
+    margin: 10px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+  blockquote {
+    border-left: 3px solid #e11d48;
+    margin: 10px 0;
+    padding: 6px 12px;
+    background-color: #fff1f2;
+    color: #9f1239;
+    font-size: 9pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background-color: #fcfcfd;
+  }
+  hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 18px 0;
+  }
+
+  /* Formal Corporate Sign-off Table */
+  .sign-off-wrapper {
+    margin-top: 24px;
+    page-break-inside: avoid;
+  }
+  table.sign-off-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #0f172a;
+    margin-top: 8px;
+  }
+  table.sign-off-table th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 8.5pt;
+    text-align: center;
+    border: 1px solid #0f172a;
+    padding: 8px 6px;
+    width: 33.33%;
+  }
+  table.sign-off-table td {
+    border: 1px solid #0f172a;
+    padding: 0;
+    vertical-align: top;
+  }
+  .sign-cell {
+    display: flex;
+    flex-direction: column;
+    height: 180px;
+    box-sizing: border-box;
+  }
+  .sign-role-title {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 700;
+  }
+  .sign-person-name {
+    font-size: 9.5pt;
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .sign-box-empty {
+    flex: 1;
+    border: 1px dashed #cbd5e1;
+    margin: 8px 10px;
+    border-radius: 4px;
+    background-color: #fcfcfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sign-box-placeholder {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    font-style: italic;
+  }
+  .sign-meta-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    font-size: 7.5pt;
+    color: #334155;
+    background-color: #ffffff;
+  }
+  .sign-meta-row {
+    margin-bottom: 2px;
+  }
+</style>
+</head>
+<body>
+  
+  <div class="doc-header-banner">
+    <div>
+      <div class="doc-title-main">SOFTWARE REQUIREMENT SPECIFICATION</div>
+      <div class="doc-subtitle">Real-Time Luxury Auction Engine</div>
+      <div class="doc-category">High-Performance Real-Time Bidding & Financial Collateral Platform</div>
+    </div>
+    <div style="text-align: right; font-size: 8pt; color: #64748b;">
+      <div><strong>PT Ako Media Asia (SALT)</strong></div>
+      <div>Strictly Confidential - Internal Document</div>
+    </div>
+  </div>
+  <h1>SOFTWARE REQUIREMENT SPECIFICATION (SRS)</h1>
+<h2>Real-Time Luxury Auction Engine</h2>
+<h3>High-Performance Real-Time Bidding &amp; Financial Collateral Platform</h3>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Document Code</strong></td>
+<td>SRS-SALT-AUCTION-2026-v1.0</td>
+</tr>
+<tr>
+<td><strong>Prepared By</strong></td>
+<td>System Analyst &amp; Solution Architecture Team</td>
+</tr>
+<tr>
+<td><strong>Date</strong></td>
+<td>24 Oct 2026</td>
+</tr>
+<tr>
+<td><strong>Version</strong></td>
+<td>1.0 (Approved Baseline)</td>
+</tr>
+<tr>
+<td><strong>Organization</strong></td>
+<td>PT Ako Media Asia (SALT)</td>
+</tr>
+<tr>
+<td><strong>Confidentiality</strong></td>
+<td>Strictly Confidential @2026 PT Ako Media Asia (SALT)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. Introduction</h2>
+<h3>1.1 Background &amp; Context</h3>
+<p>Lelang barang mewah (<em>luxury assets</em>) seperti jam tangan antik, tas desainer, perhiasan murni, kendaraan koleksi, dan memorabilia langka menuntut transparansi, kepastian dana transaksi (<em>anti-fraud</em>), serta keadilan penawaran waktu-nyata (<em>sub-second synchronization</em>). Selama ini, platform lelang konvensional kerap menghadapi kendala penipuan penawaran palsu (<em>fake bids</em>), <em>sniping bot</em> pada detik-detik akhir penutupan, pembatalan sepihak saat lelang berakhir, dan tingginya <em>network lag</em> pada arsitektur HTTP polling tradisional.</p>
+<h3>1.2 Business Objective &amp; Expected Outcome</h3>
+<p>Platform <strong>Real-Time Luxury Auction Engine</strong> dibangun untuk menghadirkan ekosistem lelang aset bernilai tinggi dengan objektif:</p>
+<ol>
+<li><strong>Verifikasi Kredensial &amp; Identitas Terpercaya:</strong> Mengintegrasikan otentikasi korporat <strong>NIRO SSO</strong> bagi penawar dan manajer lelang, serta portal internal terisolasi dengan proteksi <em>progressive lockout</em> bagi Superadmin.</li>
+<li><strong>Dynamic Collateral Protection (Jaminan Dana Nyata):</strong> Setiap penawaran yang diajukan langsung mengunci saldo penawar (<em>locked balance</em>) secara dinamis di dompet digital. Dana ini tetap tertahan sepanjang lelang berlangsung hingga tahap <em>settlement</em> akhir guna memastikan likuiditas penuh.</li>
+<li><strong>Pencegahan Bot &amp; Kesalahan Input:</strong> Menghilangkan form input teks bebas dengan menerapkan tombol inkremental bertingkat (<em>discrete increment step buttons</em>) yang telah ditentukan kurator.</li>
+<li><strong>Anti-Sniping Berbasis Lonjakan Velositas:</strong> Otomatis memperpanjang waktu lelang jika terdeteksi aktivitas penawaran $\ge 10\text{ bid/detik}$ dalam jendela 2 menit terakhir penutupan lelang.</li>
+<li><strong>Streaming Real-Time Berlatensi Rendah:</strong> Mengadopsi teknologi <strong>Server-Sent Events (SSE)</strong> yang ramah <em>firewall</em> WAF untuk menyiarkan pembaruan harga ke ribuan pengguna secara serentak dengan latensi $&lt; 300\text{ ms}$.</li>
+</ol>
+<h3>1.3 Scope of the System</h3>
+<ul>
+<li><strong>In-Scope (MVP 1):</strong>
+<ul>
+<li>Dual-login (NIRO SSO &amp; Internal Superadmin dengan progressive lockout).</li>
+<li>Manajemen Role-Based Access Control (Bidder, Auction Manager, Superadmin).</li>
+<li>Manajemen Dompet Agunan Dinamis (Top-up minimum Rp 100.000, penahanan dana lelang, unfreeze otomatis 100% bagi peserta kalah, debit bagi pemenang).</li>
+<li>Kurasi Listing Lot Lelang Barang Mewah (5 kategori, upload gambar biner multipart disimpan di PostgreSQL BLOB <code>BYTEA</code>).</li>
+<li>Dual-Model Bidding (Uncapped Time-Window vs Capped Valuation Ceiling Buy-Out).</li>
+<li>Penawaran tombol diskrit, bot penawar otomatis (<em>Automated Proxy Bidding</em>).</li>
+<li>Anti-Sniping velocity detection &amp; dynamic time extension.</li>
+<li>Background Settlement Daemon berbasis Redis ZSET &amp; distributed lock ACID.</li>
+<li>Streaming telemetri penawaran via Server-Sent Events (SSE).</li>
+</ul>
+</li>
+<li><strong>Out-of-Scope (MVP 1):</strong>
+<ul>
+<li>Pembayaran eksternal kartu kredit pihak ketiga atau cicilan PayLater.</li>
+<li>Pengiriman fisik multi-ekspedisi logistik (hanya sampai pencatatan <em>asset ownership</em> legal).</li>
+<li>Fitur <em>Forgot Password</em> dan <em>Multi-device Session Kickout</em> (ditiadakan sesuai kesepakatan).</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>2. Overview</h2>
+<h3>2.1 Document Purpose</h3>
+<p>Dokumen <em>Software Requirement Specification</em> (SRS) ini merinci seluruh persyaratan fungsional, arsitektural, antarmuka pengguna, kontrak API, serta kebutuhan non-fungsional sistem lelang barang mewah. Dokumen ini berfungsi sebagai acuan tunggal yang mengikat bagi Project Manager, Tech Lead, System Analyst, Tim Frontend Next.js, Tim Backend Golang, serta Quality Assurance.</p>
+<h3>2.2 Target Audience</h3>
+<ul>
+<li><strong>Delivery &amp; Project Management:</strong> Acuan milestone sprint, pelacakan task, dan <em>story sizing</em>.</li>
+<li><strong>System Analyst &amp; Solution Architect:</strong> Verifikasi kepatuhan prinsip arsitektur dan DDD.</li>
+<li><strong>Frontend Engineers (Next.js):</strong> Acuan <em>UI slicing</em>, <em>state management</em>, interaksi SSE EventSource, dan form validation.</li>
+<li><strong>Backend Engineers (Golang):</strong> Acuan <em>Clean Architecture</em>, <em>raw SQL</em> 70%, skrip Redis Lua, dan standard JSON response envelope.</li>
+<li><strong>QA Engineers:</strong> Acuan penyusunan skenario pengujian TDD dan uji konkurensi $10.000\text{ req/s}$.</li>
+</ul>
+<h3>2.3 Document References</h3>
+<ol>
+<li><strong>Brief &amp; Guideline Hackathon 2026:</strong> [PDF Brief](file:///C:/Users/Daniel/.gemini/antigravity/brain/bd980ca4-23ee-44a3-a5ed-230fd0690b42/.user_uploaded/media_1792812187986_0083b4e8.pdf)</li>
+<li><strong>High-Level Design (HLD):</strong> [<code>high-level-design.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/high-level-design.md)</li>
+<li><strong>Low-Level Design (LLD):</strong> [<code>lld-low-level-design.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/lld-low-level-design.md)</li>
+<li><strong>API Contracts Specification:</strong> [<code>api-contracts.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/05_Integration/api-contracts.md)</li>
+<li><strong>Database Schema &amp; DDL:</strong> [<code>database-schema.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/06_Data_Design/database-schema.md)</li>
+<li><strong>Backend Coding Standards:</strong> [<code>backend-coding-standards.md</code>](file:///d:/Projects/Salt-Hackaton-2026/05_Methodologies/backend-coding-standards.md)</li>
+<li><strong>Task Breakdown &amp; Sizing:</strong> [<code>Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx</code>](file:///d:/Projects/Salt-Hackaton-2026/08_Project_Management/Task_Breakdown/Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx)</li>
+</ol>
+<h3>2.4 Terms &amp; Definitions (Glossaries)</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">No</th>
+<th>Istilah</th>
+<th>Kepanjangan</th>
+<th>Definisi Operasional</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td><strong>NIRO SSO</strong></td>
+<td>NIRO Single Sign-On</td>
+<td>Penyedia identitas terpusat OAuth2/OIDC untuk otentikasi Bidder dan Auction Manager.</td>
+</tr>
+<tr>
+<td style="text-align:center">2</td>
+<td><strong>SSE</strong></td>
+<td>Server-Sent Events</td>
+<td>Protokol streaming data satu arah dari server ke klien via persistent HTTP <code>text/event-stream</code>.</td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td><strong>BLOB</strong></td>
+<td>Binary Large Object</td>
+<td>Tipe data <code>BYTEA</code> PostgreSQL untuk menyimpan konten biner gambar barang mewah di database.</td>
+</tr>
+<tr>
+<td style="text-align:center">4</td>
+<td><strong>Locked Balance</strong></td>
+<td>Saldo Agunan Tertahan</td>
+<td>Porsi saldo e-wallet penawar yang dikunci saat mengajukan penawaran dan tidak dapat ditarik selama lelang aktif.</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td><strong>Anti-Sniping</strong></td>
+<td>Anti-Sniping Engine</td>
+<td>Logika otomasi perpanjangan durasi lot jika terjadi lonjakan velositas penawaran $\ge 10\text{ bid/s}$ di 2 menit akhir.</td>
+</tr>
+<tr>
+<td style="text-align:center">6</td>
+<td><strong>Buy-Out</strong></td>
+<td>Instant Buy-Out</td>
+<td>Mekanisme pembelian langsung pada lelang <em>Capped</em> ketika tawaran menyentuh batas valuasi lelang.</td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td><strong>Proxy Bidding</strong></td>
+<td>Automated Proxy Bidding</td>
+<td>Bot penawar otomatis yang mewakili pengguna menaikkan harga 1 step increment setiap kali tersalip hingga batas maksimal personal.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>3. Functional Requirement</h2>
+<h3>3.1 High-Level Functional Diagram</h3>
+<pre><code class="language-mermaid">flowchart TD
+    subgraph Users [&quot;Actors &amp; Identity&quot;]
+        Bidder[&quot;Bidder (Peserta)&quot;]
+        AM[&quot;Auction Manager (Kurator)&quot;]
+        Super[&quot;Superadmin Platform&quot;]
+    end
+
+    subgraph Auth_Module [&quot;Module 1: Authentication &amp; Access Control&quot;]
+        NiroAuth[&quot;NIRO SSO Gateway &amp; Auto-Provisioning&quot;]
+        EmailAuth[&quot;Superadmin Bcrypt &amp; Progressive Lockout&quot;]
+        RoleMgmt[&quot;Role Promotion &amp; Session Revocation (Auto-Logout)&quot;]
+    end
+
+    subgraph Wallet_Module [&quot;Module 2: Dynamic Collateral E-Wallet&quot;]
+        TopUp[&quot;Deposit Saldo (Min Rp 100.000)&quot;]
+        HoldFund[&quot;Dynamic Hold Allocation (locked_balance)&quot;]
+        ReleaseFund[&quot;Final Settlement Reconciliation (Debit/Release)&quot;]
+    end
+
+    subgraph Catalog_Module [&quot;Module 3: Luxury Lot Catalog &amp; Curation&quot;]
+        CreateLot[&quot;Listing Lot &amp; Binary Upload (Postgres BYTEA)&quot;]
+        PricingRules[&quot;Model Setup (Uncapped vs Capped &amp; Steps)&quot;]
+        MarketGrid[&quot;Marketplace Query with Pagination &amp; Badges&quot;]
+    end
+
+    subgraph Bidding_Module [&quot;Module 4: Real-Time Bidding &amp; Lua Engine&quot;]
+        StepBid[&quot;Discrete Increment Step Button Execution&quot;]
+        ProxyBot[&quot;Autonomous Proxy Bidding Loop&quot;]
+        AntiSnipe[&quot;Velocity Surge Tracker (&gt;= 10 bid/s in 2m window)&quot;]
+        Buyout[&quot;Instant Buyout Ceiling Resolver&quot;]
+    end
+
+    subgraph Streaming_Module [&quot;Module 5: Telemetry &amp; Streaming Hub&quot;]
+        SSEHub[&quot;Server-Sent Events Broadcast Hub (&lt; 300 ms)&quot;]
+    end
+
+    Bidder --&gt; NiroAuth
+    AM --&gt; NiroAuth
+    Super --&gt; EmailAuth
+
+    Bidder --&gt; TopUp
+    Bidder --&gt; StepBid
+    Bidder --&gt; ProxyBot
+    AM --&gt; CreateLot
+    Super --&gt; RoleMgmt
+
+    StepBid --&gt; HoldFund
+    StepBid --&gt; AntiSnipe
+    StepBid --&gt; Buyout
+    StepBid --&gt; SSEHub
+
+    PricingRules --&gt; CreateLot
+    ReleaseFund --&gt; Wallet_Module
+</code></pre>
+<h3>3.2 Use Case Specifications &amp; Actor Matrix</h3>
+<table>
+<thead>
+<tr>
+<th>Use Case ID</th>
+<th>Nama Use Case</th>
+<th>Aktor Utama</th>
+<th>Deskripsi Singkat</th>
+<th>Pre-kondisi</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>UC-AUTH-01</strong></td>
+<td>Login NIRO SSO</td>
+<td>Bidder, AM</td>
+<td>Masuk via OAuth2 NIRO. Jika pengguna baru, sistem mendaftarkan role <code>BIDDER</code> secara otomatis.</td>
+<td>Pengguna memiliki akun NIRO aktif.</td>
+</tr>
+<tr>
+<td><strong>UC-AUTH-02</strong></td>
+<td>Login Superadmin</td>
+<td>Superadmin</td>
+<td>Masuk via email &amp; password internal (min 12 char) dengan progressive lockout.</td>
+<td>Kredensial superadmin terdaftar.</td>
+</tr>
+<tr>
+<td><strong>UC-AUTH-03</strong></td>
+<td>Promosi Role User</td>
+<td>Superadmin</td>
+<td>Mengubah role user NIRO menjadi <code>ADMIN</code> dan otomatis logout sesi aktif user.</td>
+<td>Superadmin login; Target user terdaftar.</td>
+</tr>
+<tr>
+<td><strong>UC-WAL-01</strong></td>
+<td>Top-Up E-Wallet</td>
+<td>Bidder</td>
+<td>Menambah saldo likuid penawar dengan nominal minimal Rp 100.000.</td>
+<td>Pengguna berstatus role <code>BIDDER</code>.</td>
+</tr>
+<tr>
+<td><strong>UC-BID-01</strong></td>
+<td>Penawaran Inkremental</td>
+<td>Bidder</td>
+<td>Menawar lot barang mewah menggunakan tombol bertingkat diskrit (tanpa teks bebas).</td>
+<td>Saldo bebas cukup; Lot berstatus <code>ACTIVE</code>.</td>
+</tr>
+<tr>
+<td><strong>UC-BID-02</strong></td>
+<td>Aktivasi Proxy Bid</td>
+<td>Bidder</td>
+<td>Menyetel batas penawaran otomatis agar sistem menawar balik saat tersalip.</td>
+<td>Saldo bebas $\ge$ limit batas proxy.</td>
+</tr>
+<tr>
+<td><strong>UC-BID-03</strong></td>
+<td>Beli Langsung (Buyout)</td>
+<td>Bidder</td>
+<td>Membeli instan lot lelang model Capped pada harga batas valuasi ceiling.</td>
+<td>Saldo bebas $\ge$ harga valuation ceiling.</td>
+</tr>
+<tr>
+<td><strong>UC-LOT-01</strong></td>
+<td>Listing Lot Baru</td>
+<td>AM</td>
+<td>Mengunggah foto biner, menentukan kelipatan tombol bid, harga dasar, dan extend window.</td>
+<td>User berstatus role <code>ADMIN</code>.</td>
+</tr>
+<tr>
+<td><strong>UC-SET-01</strong></td>
+<td>Otomasi Settlement</td>
+<td>System Daemon</td>
+<td>Memotong saldo pemenang, melepas agunan peserta kalah 100%, dan menerbitkan hak milik aset.</td>
+<td>Durasi lelang habis atau buyout tercapai.</td>
+</tr>
+<tr>
+<td><strong>UC-STR-01</strong></td>
+<td>Streaming Live Harga</td>
+<td>Universal</td>
+<td>Menerima pembaruan harga lelang dan timer via Server-Sent Events (SSE).</td>
+<td>Terkoneksi ke internet.</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Detailed User Flow (Core Scenarios)</h3>
+<ol>
+<li><strong>Alur Login &amp; Auto-Provisioning NIRO:</strong>
+<code>FE Request Redirect URL</code> $\rightarrow$ <code>User Login di NIRO</code> $\rightarrow$ <code>FE Terima niro_token</code> $\rightarrow$ <code>POST /api/v1/auth/login/niro</code> $\rightarrow$ <code>BE Validasi ke NIRO</code> $\rightarrow$ <code>Cek DB users</code>:
+<ul>
+<li>Jika belum ada: Insert user (role <code>BIDDER</code>) + Buat dompet saldo 0 $\rightarrow$ Return 201 Created.</li>
+<li>Jika sudah ada: Ambil data user &amp; role terkini $\rightarrow$ Return 200 OK.</li>
+</ul>
+</li>
+<li><strong>Alur Penawaran Atomik Hot-Path (Inkremental):</strong>
+<code>Bidder Klik Tombol (+Rp 5.000.000)</code> $\rightarrow$ <code>Modal Konfirmasi Muncul</code> $\rightarrow$ <code>Bidder Klik Confirm</code> $\rightarrow$ <code>POST /api/v1/auctions/:id/bids</code> $\rightarrow$ <code>Redis Lua bid_placement.lua</code>:
+<ul>
+<li>Validasi saldo <code>available_balance &gt;= target_bid</code>.</li>
+<li>Kurangi <code>available_balance</code>, pindahkan ke <code>locked_balance</code>.</li>
+<li>Update <code>current_price</code> dan <code>highest_bidder_id</code>.</li>
+<li>Cek Anti-Sniping: jika sisa waktu $\le 120\text{s}$ dan velositas $\ge 10\text{ bid/s}$, tambahkan <code>end_time = end_time + extend_minutes</code>.</li>
+<li>Cek Buy-Out: jika <code>new_price &gt;= valuation_ceiling</code>, ubah status lot jadi <code>CLOSED_AWARDED</code>.</li>
+<li>Terbitkan pesan event ke Redis Pub/Sub $\rightarrow$ Didistribusikan oleh SSE Hub ke seluruh klien dalam $&lt; 300\text{ ms}$.</li>
+</ul>
+</li>
+</ol>
+<h3>3.4 Business Rules Inventory (BR-XXX)</h3>
+<ul>
+<li><strong>BR-001 (Otentikasi Ganda):</strong> Bidder dan Auction Manager wajib menggunakan NIRO SSO. Superadmin login via email internal. Upaya login akun Bidder/AM melalui form email ditolak mentah-mentah.</li>
+<li><strong>BR-002 (Progressive Lockout Superadmin):</strong> Gagal login berturut-turut pada Superadmin memicu penguncian bertingkat: 3x gagal pertama = 1 menit; 3x gagal kedua = 2 menit; 3x gagal ketiga = 1 jam.</li>
+<li><strong>BR-003 (Auto-Logout Promosi Role):</strong> Saat user dipromosikan ke <code>ADMIN</code> oleh Superadmin, sistem secara instan menaikkan <code>token_version</code> di Redis, membatalkan token sesi aktif, dan memaksa user untuk login kembali.</li>
+<li><strong>BR-004 (Minimum Top-Up):</strong> Nilai deposit e-wallet minimal adalah Rp 100.000. AM dan Superadmin dilarang melakukan top-up dompet (HTTP 403).</li>
+<li><strong>BR-005 (Penahanan Agunan Dinamis):</strong> Saldo pengguna tidak ditahan secara pasif di awal, melainkan hanya saat mengajukan penawaran. Saldo penawar yang tersalip tetap tertahan (<em>locked</em>) sepanjang lelang aktif hingga tahap penyelesaian (<em>settlement</em>).</li>
+<li><strong>BR-006 (Pencegahan Typo / Tombol Diskrit):</strong> Input penawaran wajib menggunakan tombol kelipatan bertingkat (<code>allowed_increment_steps</code>). Dilarang keras menyediakan form input teks bebas.</li>
+<li><strong>BR-007 (Ketentuan Anti-Sniping):</strong> Berlaku hanya pada 2 menit terakhir (<code>remaining_time &lt;= 120s</code>). Pemicu ekstensi membutuhkan intensitas lonjakan penawaran $\ge 10\text{ bid/detik}$.</li>
+<li><strong>BR-008 (Tipe Data Moneter):</strong> Seluruh variabel moneter finansial (saldo, harga, kelipatan, ceiling) wajib dikalkulasi dan diserialisasi menggunakan tipe data <strong><code>float64</code></strong>.</li>
+<li><strong>BR-009 (Penyimpanan Media Mandiri):</strong> Gambar aset lelang diunggah sebagai berkas biner multipart, disimpan dalam kolom <code>BYTEA</code> PostgreSQL (BLOB), dan disajikan kembali sebagai string Base64 terkompresi.</li>
+</ul>
+<h3>3.5 Functional Requirements Inventory (FR-XXX)</h3>
+<table>
+<thead>
+<tr>
+<th>ID Kebutuhan</th>
+<th>Deskripsi Fungsional</th>
+<th>Modul Terkait</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FR-AUTH-001</strong></td>
+<td>Sistem mampu mengembalikan URL otorisasi resmi NIRO SSO beserta CSRF state token.</td>
+<td>Autentikasi</td>
+</tr>
+<tr>
+<td><strong>FR-AUTH-002</strong></td>
+<td>Sistem mampu memvalidasi token NIRO dan mendaftarkan user baru secara transparan (<em>auto-provisioning</em>).</td>
+<td>Autentikasi</td>
+</tr>
+<tr>
+<td><strong>FR-AUTH-003</strong></td>
+<td>Sistem mampu mengunci akun Superadmin secara bertingkat saat terjadi kesalahan password berulang.</td>
+<td>Autentikasi</td>
+</tr>
+<tr>
+<td><strong>FR-AUTH-004</strong></td>
+<td>Sistem mampu membatalkan sesi aktif user ketika perannya diubah menjadi Auction Manager.</td>
+<td>Otorisasi RBAC</td>
+</tr>
+<tr>
+<td><strong>FR-WAL-001</strong></td>
+<td>Sistem mampu menambah saldo e-wallet penawar dan mencatat mutasi jurnal <em>immutable ledger</em>.</td>
+<td>E-Wallet</td>
+</tr>
+<tr>
+<td><strong>FR-WAL-002</strong></td>
+<td>Sistem mampu mengunci saldo bebas (<em>available</em>) ke saldo tertahan (<em>locked</em>) saat penawaran diajukan.</td>
+<td>E-Wallet</td>
+</tr>
+<tr>
+<td><strong>FR-BID-001</strong></td>
+<td>Sistem mampu mengeksekusi penawaran inkremental diskrit secara serial dan atomik melalui skrip Redis Lua.</td>
+<td>Bidding Engine</td>
+</tr>
+<tr>
+<td><strong>FR-BID-002</strong></td>
+<td>Sistem mampu mendeteksi batas valuasi lelang model Capped dan menutup lelang secara instan (<em>buyout</em>).</td>
+<td>Bidding Engine</td>
+</tr>
+<tr>
+<td><strong>FR-BID-003</strong></td>
+<td>Sistem mampu mengevaluasi aturan proxy bidding dan mengajukan counter-bid otomatis saat tersalip.</td>
+<td>Proxy Worker</td>
+</tr>
+<tr>
+<td><strong>FR-LOT-001</strong></td>
+<td>Sistem mampu menerima upload gambar multipart dan menyimpannya sebagai BLOB <code>BYTEA</code> di database.</td>
+<td>Katalog Lelang</td>
+</tr>
+<tr>
+<td><strong>FR-LOT-002</strong></td>
+<td>Sistem mampu menyajikan daftar katalog lelang aktif lengkap dengan pagination metadata terstandarisasi.</td>
+<td>Katalog Lelang</td>
+</tr>
+<tr>
+<td><strong>FR-SET-001</strong></td>
+<td>Sistem background daemon mampu mendeteksi lelang kedaluwarsa via Redis ZSET dan mengeksekusi settlement ACID.</td>
+<td>Settlement Daemon</td>
+</tr>
+<tr>
+<td><strong>FR-STR-001</strong></td>
+<td>Sistem mampu menyiarkan mutasi harga secara persisten ke seluruh viewer via Server-Sent Events (SSE).</td>
+<td>Streaming Engine</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. End – User Requirement</h2>
+<h3>4.1 UI Wireframe &amp; Design Specifications</h3>
+<p>Sistem antarmuka pengguna berbasis <strong>Next.js 14 Web Application</strong> dengan antarmuka responsif sesuai desain Figma:</p>
+<ol>
+<li><strong>Marketplace Catalog Grid:</strong>
+<ul>
+<li>Menampilkan kartu lot barang mewah (Foto Base64, Kategori Aset, Judul Lot, Base Price, Latest Bid, Jumlah Bid, Countdown Timer Aktif, Heart Watchlist Icon, dan Tombol “View Detail”).</li>
+<li>Status badge kontekstual: <code>Active</code> (Hijau), <code>Leading</code> (Biru), <code>Ending Soon</code> (Kuning), <code>Extended</code> (Oranye), <code>Scheduled</code> (Abu-abu).</li>
+<li>Kontrol pagination di footer (<code>Previous</code>, <code>Page X of Y</code>, <code>Next</code>).</li>
+</ul>
+</li>
+<li><strong>Product Detail Page (Live Bidding Room):</strong>
+<ul>
+<li>Area galeri foto produk resolusi tinggi bersumber dari Base64 PostgreSQL BLOB.</li>
+<li>Tabs informasi: <em>Details</em>, <em>Bidders</em>, <em>Bid History</em>, <em>Documents / Certificate of Authenticity</em>.</li>
+<li>Countdown timer sinkron server dengan indikator visual <em>critical zone</em>.</li>
+<li>Panel kanan: Tombol penawaran diskrit (+Rp 5.000.000, +Rp 10.000.000), Tombol Beli Langsung (Buyout) jika model Capped.</li>
+<li>Autonomous Bidding Card: Toggle Switch (Start/Pause/Stop) dan input limit maksimum.</li>
+<li>Modal Konfirmasi Penawaran: Menampilkan ringkasan lot, nominal bid, dan info saldo dompet sebelum eksekusi.</li>
+</ul>
+</li>
+<li><strong>Bid History &amp; Settlement Page:</strong>
+<ul>
+<li>4 Widget ringkasan metrik: <em>Active Bids</em>, <em>Leading</em>, <em>Outbid</em>, <em>Won / Settled</em>.</li>
+<li>Tabel riwayat penawaran interaktif dan filter status tabs (<em>All</em>, <em>Active Bids</em>, <em>Won</em>, <em>Lost</em>).</li>
+<li>Sidebar rincian penyelesaian (<em>Settlement Detail</em>): Hammer price, Buyer premium, Agunan yang diterapkan, dan status pencairan.</li>
+</ul>
+</li>
+</ol>
+<h3>4.2 Form Inputs, Validations &amp; State Handling</h3>
+<ul>
+<li><strong>Form Top-Up:</strong> Validasi input angka bulat positif bertipe <code>float64</code>, nominal $\ge \text{Rp } 100.000$. Menampilkan <em>chips quick-select</em> (+100k, +500k, +1m, +5m).</li>
+<li><strong>Form Pembuatan Lot (Admin):</strong> Validasi seluruh field wajib (Judul, Kategori dari 5 enum, Deskripsi, Starting Price, Allowed Increments, File gambar binary biner $\le 5\text{ MB}$, Durasi jendela lelang, dan Durasi Anti-Sniping menit).</li>
+</ul>
+<h3>4.3 Error Handling &amp; Edge Cases in UI</h3>
+<ul>
+<li><strong>Koneksi Jaringan Terputus (Network Interrupted):</strong>
+<ul>
+<li>Muncul banner peringatan kuning di bagian atas: <em>“Live prices may be outdated. Reconnecting… Do not assume a submitted bid has failed or succeeded.”</em></li>
+<li>Tombol manual <em>“Retry now”</em> untuk memicu inisialisasi ulang koneksi EventSource SSE.</li>
+</ul>
+</li>
+<li><strong>Saldo Tidak Cukup:</strong> Tombol bid dinonaktifkan (<em>disabled</em>) dengan teks keterangan merah: <em>“Insufficient available balance. Please top up.”</em></li>
+<li><strong>Sesi Kedaluwarsa / Auto-Logout:</strong> Muncul modal dialog penjelas bahwa peran akun telah diperbarui, lalu mengarahkan pengguna secara otomatis ke halaman login NIRO SSO.</li>
+</ul>
+<hr>
+<h2>5. Architecture Diagram</h2>
+<h3>5.1 High-Level System Architecture Diagram</h3>
+<p>Topologi arsitektur sistem mengacu pada standar <em>Enterprise Multi-Tier Architecture</em>:</p>
+<pre><code class="language-mermaid">flowchart TD
+    Client[&quot;Client Tier (Next.js 14 Web Portal / Mobile)&quot;]
+    DNS[&quot;Enterprise DNS (auction.luxury.salt.id)&quot;]
+    F5[&quot;External Perimeter: F5 BIG-IP WAF (SSL :443)&quot;]
+    DMZ[&quot;DMZ Tier: Reverse Proxy &amp; Rate Limiter Nodes&quot;]
+    InternalLB[&quot;Internal Load Balancer (Dual-Site :10443)&quot;]
+    Gateway[&quot;Ingress Gateway Nodes (Port 443 HTTPS)&quot;]
+    K8s[&quot;On-Premise Dual-Site Kubernetes Cluster (Golang 20 Pods Mesh)&quot;]
+    Redis[&quot;In-Memory Tier: Redis 7 Cluster (bid_placement.lua)&quot;]
+    DB[(&quot;Persistence Tier: PostgreSQL 16 (ACID Ledger &amp; BYTEA BLOB)&quot;)]
+    NIRO[&quot;External Identity: NIRO SSO Server&quot;]
+    SSE[&quot;Streaming Engine: Server-Sent Events (SSE HTTP/2 Hub)&quot;]
+
+    Client --&gt; DNS --&gt; F5 --&gt; DMZ --&gt; InternalLB --&gt; Gateway --&gt; K8s
+    K8s &lt;--&gt; Redis
+    K8s --&gt; DB
+    K8s -.-&gt; NIRO
+    K8s --&gt; SSE
+    SSE -.-&gt;|text/event-stream &lt; 300ms| Client
+</code></pre>
+<p><em>(Diagram arsitektur infrastruktur terperinci versi vektor resolusi tinggi 2500x1902 tersedia di file [<code>auction-platform-architecture.svg</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/Diagrams/auction-platform-architecture.svg)).</em></p>
+<h3>5.2 Low-Level Design Activity Diagram (Bidding Hot-Path)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    autonumber
+    actor Bidder as Peserta Lelang
+    participant FE as Next.js Web App
+    participant API as Golang Bid Service
+    participant Redis as Redis 7 (bid_placement.lua)
+    participant SSE as SSE Stream Hub
+    participant DB as PostgreSQL 16 Ledger
+
+    Bidder-&gt;&gt;FE: Klik Tombol Increment (+Rp 5.000.000)
+    FE-&gt;&gt;FE: Tampilkan Modal Konfirmasi Penawaran
+    Bidder-&gt;&gt;FE: Klik &quot;Confirm Bid&quot;
+    FE-&gt;&gt;API: POST /api/v1/auctions/:id/bids {increment: 5000000.00}
+    API-&gt;&gt;Redis: EVALSHA bid_placement.lua (user_id, lot_id, new_price)
+    
+    critical Atomic In-Memory Execution (&lt; 5 ms)
+        Redis-&gt;&gt;Redis: Cek status lot == 'ACTIVE' &amp; now &lt; end_time
+        Redis-&gt;&gt;Redis: Cek wallet available_balance &gt;= new_price
+        Redis-&gt;&gt;Redis: Mutasi: available_balance -= price, locked_balance += price
+        Redis-&gt;&gt;Redis: Set current_price = new_price &amp; highest_bidder_id = user_id
+        Redis-&gt;&gt;Redis: Evaluasi Velocity Anti-Sniping (&gt;= 10 bid/s di 2 menit akhir)
+        Redis-&gt;&gt;Redis: Evaluasi Capped Buyout (new_price &gt;= valuation_ceiling)
+    end
+
+    Redis--&gt;&gt;API: Return OK {new_price, bidder_id, end_time, status}
+    API-&gt;&gt;Redis: PUBLISH channel:auction:events {PRICE_UPDATED}
+    Redis--&gt;&gt;SSE: Ingest Event Frame
+    SSE--&gt;&gt;FE: Stream Push ke Semua Klien (&lt; 300 ms)
+    API-)DB: Async Insert ke tabel bids
+    API--&gt;&gt;FE: 200 OK {&quot;status&quot;: &quot;success&quot;, &quot;data&quot;: {...}}
+    FE--&gt;&gt;Bidder: Tampilkan Status &quot;You are the Highest Bidder&quot;
+</code></pre>
+<hr>
+<h2>6. Functional API</h2>
+<h3>6.1 Surrounding System Dependencies</h3>
+<ol>
+<li><strong>NIRO SSO Server:</strong> Penyedia layanan otentikasi identitas eksternal berbasis OAuth2/OIDC (URL authorization, token verification, dan user profile extraction).</li>
+<li><strong>PostgreSQL 16 Relational Engine:</strong> Authoritative persistent ledger yang menyimpan data user, saldo moneter, audit bid, kepemilikan aset, dan file gambar biner <code>BYTEA</code>.</li>
+<li><strong>Redis 7 In-Memory Cluster:</strong> Database memori berkecepatan tinggi untuk eksekusi skrip Lua atomik, pelacak counter velositas, dan ZSET indeks expiry lelang.</li>
+</ol>
+<h3>6.2 REST API Endpoints Specification</h3>
+<p>Seluruh endpoint menggunakan format response envelope standar backend:</p>
+<ul>
+<li>Sukses: <code>{&quot;status&quot;: &quot;success&quot;, &quot;data&quot;: { ... }}</code></li>
+<li>Gagal: <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;...&quot;, &quot;message&quot;: &quot;...&quot;}}</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Role Akses</th>
+<th>Fungsi &amp; Kontrak Utama</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/niro/authorize-url</code></td>
+<td>Public</td>
+<td>Mendapatkan URL redirect SSO NIRO beserta state parameter CSRF.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/niro</code></td>
+<td>Public</td>
+<td>Tukar token NIRO; auto-register jika baru (role <code>BIDDER</code>) atau buat sesi JWT jika sudah ada.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/email</code></td>
+<td>Public</td>
+<td>Login email &amp; password (min. 12 char) khusus <code>SUPERADMIN</code> dengan progressive lockout.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/users</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mengambil daftar user terdaftar NIRO (lengkap dengan pagination meta).</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/admin/users/:id/role</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mengubah role user ke <code>ADMIN</code> dan otomatis memicu <em>session revocation</em> (auto-logout).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/wallet/me</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengambil saldo bebas likuid (<code>available_balance</code>) dan agunan (<code>locked_balance</code>).</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/wallet/topup</code></td>
+<td><code>BIDDER</code></td>
+<td>Menambah saldo deposit e-wallet penawar (minimal Rp 100.000).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/wallet/transactions</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengambil riwayat mutasi jurnal keuangan penawar berhalaman (<em>pagination</em>).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/active</code></td>
+<td>Public</td>
+<td>Menampilkan katalog lelang aktif (gambar thumbnail Base64 &amp; pagination meta).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/:id</code></td>
+<td>Public</td>
+<td>Menampilkan detail spesifikasi lot, jaminan keaslian, Base64 utuh, dan chip tombol bid.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/bids</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengirim penawaran tombol diskrit; validasi instan buyout &amp; anti-sniping.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengonfigurasi batas limit penawar otomatis (<em>proxy bot</em>).</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Membatalkan / menonaktifkan konfigurasi bot penawar otomatis.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/auctions</code></td>
+<td><code>ADMIN</code></td>
+<td>Membuat listing lot baru (<code>multipart/form-data</code>, file binary disimpan ke DB <code>BYTEA</code>).</td>
+</tr>
+</tbody>
+</table>
+<h3>6.3 Real-Time Streaming Specification (Server-Sent Events)</h3>
+<ul>
+<li><strong>Koneksi Room Lot:</strong> <code>GET /api/v1/sse/auctions/:id</code></li>
+<li><strong>Koneksi Ticker Global:</strong> <code>GET /api/v1/sse/catalog</code></li>
+<li><strong>Format Event Stream:</strong>
+<ul>
+<li><code>event: PRICE_UPDATED</code> $\rightarrow$ Mutasi harga penawaran terkini dan ID penawar tertinggi.</li>
+<li><code>event: TIME_EXTENDED</code> $\rightarrow$ Pemberitahuan perpanjangan waktu anti-sniping.</li>
+<li><code>event: AUCTION_BUYOUT_CLOSED</code> $\rightarrow$ Pemberitahuan lelang ditutup karena buyout.</li>
+<li><code>event: AUCTION_CONCLUDED</code> $\rightarrow$ Pemberitahuan lelang selesai dan settlement dieksekusi.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2>7. Non-Functional Requirement</h2>
+<h3>7.1 Performance &amp; Concurrency (SLA)</h3>
+<ul>
+<li><strong>Target Latensi Hot-Path:</strong> Pemrosesan penawaran di lapisan memori Redis Lua wajib selesai dalam waktu $&lt; 5\text{ ms}$.</li>
+<li><strong>Latensi Siaran Real-Time:</strong> Sinkronisasi pembaruan harga ke seluruh browser penawar via SSE wajib $&lt; 300\text{ ms}$.</li>
+<li><strong>Kapasitas Konkurensi:</strong> Sistem mampu melayani lonjakan beban hingga <strong>10.000 transaksi/detik</strong> tanpa terjadi <em>race condition</em> atau data ganda.</li>
+</ul>
+<h3>7.2 Availability &amp; Resilience</h3>
+<ul>
+<li><strong>Dual-Site Failover:</strong> Arsitektur Kubernetes dan PostgreSQL mendukung topologi multi-node dengan replikasi data sinkron.</li>
+<li><strong>Auto-Reconnect SSE:</strong> Klien frontend otomatis mencoba menyambung kembali (<em>reconnect</em>) secara berkala jika jaringan terputus tanpa menghilangkan status lelang di memori klien.</li>
+<li><strong>Distributed Lock:</strong> Penguncian berbasis Redis Mutex (<code>lock:settle:{lot_id}</code>) menjamin proses <em>settlement</em> lelang hanya dieksekusi tepat satu kali oleh satu <em>daemon instance</em>.</li>
+</ul>
+<h3>7.3 Security &amp; Access Control</h3>
+<ul>
+<li><strong>Proteksi Brute-Force Superadmin:</strong> Progressive lockout memitigasi serangan kamus (<em>dictionary attack</em>) dengan pembatasan waktu bertingkat (1m $\rightarrow$ 2m $\rightarrow$ 1h).</li>
+<li><strong>Strict Role Segregation:</strong> Endpoint top-up saldo dan penawaran lelang secara ketat diisolasi hanya untuk peran <code>BIDDER</code>. AM dan Superadmin dilarang keras menawar lot lelang untuk mencegah benturan kepentingan (<em>conflict of interest</em>).</li>
+<li><strong>Token Invalidation:</strong> Perubahan hak akses pengguna memicu pembatalan token seketika (<em>token revocation</em>) melalui penambahan <code>token_version</code> di memori Redis.</li>
+</ul>
+<h3>7.4 Data Integrity &amp; Audit Trail</h3>
+<ul>
+<li><strong>ACID Financial Ledger:</strong> Semua mutasi saldo penawar (Top-up, Lock, Debit Pemenang, Release Agunan) dicatat dalam tabel <code>ledger_entries</code> dengan prinsip jurnal berpasangan (<em>double-entry bookkeeping</em>) yang tidak dapat diubah (<em>immutable</em>).</li>
+<li><strong>Audit Trail Penawaran:</strong> Setiap histori penawaran yang sah maupun gagal tersimpan lengkap dengan <em>timestamp</em> presisi milidetik pada PostgreSQL.</li>
+</ul>
+<hr>
+<h2>8. Sign-Off</h2>
+<p>Dokumen spesifikasi kebutuhan perangkat lunak (<em>Software Requirement Specification</em>) ini telah ditinjau secara menyeluruh, diselaraskan dengan kebutuhan kompetisi Hackathon 2026 dan pedoman teknis internal PT Ako Media Asia (SALT), serta secara resmi disahkan sebagai acuan tunggal pengembangan sistem.</p>
+
+<div class="sign-off-wrapper">
+  <table class="sign-off-table">
+    <thead>
+      <tr>
+        <th>
+          <div class="sign-role-title">Project Manager</div>
+          <div class="sign-person-name">Geri Setyo Andrian</div>
+        </th>
+        <th>
+          <div class="sign-role-title">Tech Lead / Technical Architect</div>
+          <div class="sign-person-name">Alini</div>
+        </th>
+        <th>
+          <div class="sign-role-title">Project Analyst</div>
+          <div class="sign-person-name">Aprilia Dwi Lestari</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+</body>
+</html>
