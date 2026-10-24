@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>SOFTWARE REQUIREMENT SPECIFICATION - Real-Time Luxury Auction Engine</title>
+  <title>SRS - Software Requirement Specification - Real-Time Luxury Auction Engine</title>
   <style>
   @page {
     size: A4;
@@ -18,7 +18,6 @@
     padding: 0;
   }
   
-  /* Document Title & Cover Header */
   .doc-header-banner {
     border-bottom: 3px solid #e11d48;
     padding-bottom: 12px;
@@ -49,7 +48,7 @@
     margin-top: 2px;
   }
 
-  h1 { display: none; } /* Replaced by custom header */
+  h1 { display: none; }
   h2 {
     font-size: 13pt;
     font-weight: 700;
@@ -168,7 +167,7 @@
   .sign-cell {
     display: flex;
     flex-direction: column;
-    height: 180px;
+    height: 185px;
     box-sizing: border-box;
   }
   .sign-role-title {
@@ -184,24 +183,41 @@
     font-weight: 700;
     margin-top: 2px;
   }
+  .sign-box-sig {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    margin: 6px 10px;
+    border-radius: 4px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
   .sign-box-empty {
     flex: 1;
     border: 1px dashed #cbd5e1;
-    margin: 8px 10px;
+    margin: 6px 10px;
     border-radius: 4px;
     background-color: #fcfcfd;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   }
   .sign-box-placeholder {
     font-size: 7.5pt;
     color: #94a3b8;
     font-style: italic;
   }
+  .sign-image {
+    max-height: 80px;
+    max-width: 90%;
+    object-fit: contain;
+  }
   .sign-meta-footer {
     border-top: 1px solid #e2e8f0;
-    padding: 6px 10px;
+    padding: 5px 10px;
     font-size: 7.5pt;
     color: #334155;
     background-color: #ffffff;
@@ -212,205 +228,113 @@
 </style>
 </head>
 <body>
-  
-  <div class="doc-header-banner">
-    <div>
-      <div class="doc-title-main">SOFTWARE REQUIREMENT SPECIFICATION</div>
-      <div class="doc-subtitle">Real-Time Luxury Auction Engine</div>
-      <div class="doc-category">High-Performance Real-Time Bidding & Financial Collateral Platform</div>
-    </div>
-    <div style="text-align: right; font-size: 8pt; color: #64748b;">
-      <div><strong>PT Ako Media Asia (SALT)</strong></div>
-      <div>Strictly Confidential - Internal Document</div>
-    </div>
-  </div>
-  <h1>SOFTWARE REQUIREMENT SPECIFICATION (SRS)</h1>
+
+<h1>SOFTWARE REQUIREMENT SPECIFICATION (SRS)</h1>
 <h2>Real-Time Luxury Auction Engine</h2>
-<h3>High-Performance Real-Time Bidding &amp; Financial Collateral Platform</h3>
-<table>
-<thead>
-<tr>
-<th>Metadata</th>
-<th>Value</th>
-</tr>
-</thead>
+<h3>High-Performance Real-Time Bidding & Financial Collateral Platform</h3>
+<table class="doc-table">
+<thead><tr><th>Metadata</th><th>Value</th></tr></thead>
 <tbody>
-<tr>
-<td><strong>Document Code</strong></td>
-<td>SRS-SALT-AUCTION-2026-v1.0</td>
-</tr>
-<tr>
-<td><strong>Prepared By</strong></td>
-<td>System Analyst &amp; Solution Architecture Team</td>
-</tr>
-<tr>
-<td><strong>Date</strong></td>
-<td>24 Oct 2026</td>
-</tr>
-<tr>
-<td><strong>Version</strong></td>
-<td>1.0 (Approved Baseline)</td>
-</tr>
-<tr>
-<td><strong>Organization</strong></td>
-<td>PT Ako Media Asia (SALT)</td>
-</tr>
-<tr>
-<td><strong>Confidentiality</strong></td>
-<td>Strictly Confidential @2026 PT Ako Media Asia (SALT)</td>
-</tr>
-</tbody>
-</table>
+<tr><td>**Document Code**</td><td>SRS-SALT-AUCTION-2026-v1.0</td></tr>
+<tr><td>**Prepared By**</td><td>System Analyst & Solution Architecture Team</td></tr>
+<tr><td>**Date**</td><td>24 Oct 2026</td></tr>
+<tr><td>**Version**</td><td>1.0 (Approved Baseline)</td></tr>
+<tr><td>**Organization**</td><td>PT Ako Media Asia (SALT)</td></tr>
+<tr><td>**Confidentiality**</td><td>Strictly Confidential @2026 PT Ako Media Asia (SALT)</td></tr>
+</tbody></table>
 <hr>
 <h2>1. Introduction</h2>
-<h3>1.1 Background &amp; Context</h3>
-<p>Lelang barang mewah (<em>luxury assets</em>) seperti jam tangan antik, tas desainer, perhiasan murni, kendaraan koleksi, dan memorabilia langka menuntut transparansi, kepastian dana transaksi (<em>anti-fraud</em>), serta keadilan penawaran waktu-nyata (<em>sub-second synchronization</em>). Selama ini, platform lelang konvensional kerap menghadapi kendala penipuan penawaran palsu (<em>fake bids</em>), <em>sniping bot</em> pada detik-detik akhir penutupan, pembatalan sepihak saat lelang berakhir, dan tingginya <em>network lag</em> pada arsitektur HTTP polling tradisional.</p>
-<h3>1.2 Business Objective &amp; Expected Outcome</h3>
-<p>Platform <strong>Real-Time Luxury Auction Engine</strong> dibangun untuk menghadirkan ekosistem lelang aset bernilai tinggi dengan objektif:</p>
-<ol>
-<li><strong>Verifikasi Kredensial &amp; Identitas Terpercaya:</strong> Mengintegrasikan otentikasi korporat <strong>NIRO SSO</strong> bagi penawar dan manajer lelang, serta portal internal terisolasi dengan proteksi <em>progressive lockout</em> bagi Superadmin.</li>
-<li><strong>Dynamic Collateral Protection (Jaminan Dana Nyata):</strong> Setiap penawaran yang diajukan langsung mengunci saldo penawar (<em>locked balance</em>) secara dinamis di dompet digital. Dana ini tetap tertahan sepanjang lelang berlangsung hingga tahap <em>settlement</em> akhir guna memastikan likuiditas penuh.</li>
-<li><strong>Pencegahan Bot &amp; Kesalahan Input:</strong> Menghilangkan form input teks bebas dengan menerapkan tombol inkremental bertingkat (<em>discrete increment step buttons</em>) yang telah ditentukan kurator.</li>
-<li><strong>Anti-Sniping Berbasis Lonjakan Velositas:</strong> Otomatis memperpanjang waktu lelang jika terdeteksi aktivitas penawaran $\ge 10\text{ bid/detik}$ dalam jendela 2 menit terakhir penutupan lelang.</li>
-<li><strong>Streaming Real-Time Berlatensi Rendah:</strong> Mengadopsi teknologi <strong>Server-Sent Events (SSE)</strong> yang ramah <em>firewall</em> WAF untuk menyiarkan pembaruan harga ke ribuan pengguna secara serentak dengan latensi $&lt; 300\text{ ms}$.</li>
-</ol>
+<h3>1.1 Background & Context</h3>
+<p>Lelang barang mewah (*luxury assets*) seperti jam tangan antik, tas desainer, perhiasan murni, kendaraan koleksi, dan memorabilia langka menuntut transparansi, kepastian dana transaksi (*anti-fraud*), serta keadilan penawaran waktu-nyata (*sub-second synchronization*). Selama ini, platform lelang konvensional kerap menghadapi kendala penipuan penawaran palsu (*fake bids*), *sniping bot* pada detik-detik akhir penutupan, pembatalan sepihak saat lelang berakhir, dan tingginya *network lag* pada arsitektur HTTP polling tradisional.</p>
+<h3>1.2 Business Objective & Expected Outcome</h3>
+<p>Platform **Real-Time Luxury Auction Engine** dibangun untuk menghadirkan ekosistem lelang aset bernilai tinggi dengan objektif:</p>
+<p>1. **Verifikasi Kredensial & Identitas Terpercaya:** Mengintegrasikan otentikasi korporat **NIRO SSO** bagi penawar dan manajer lelang, serta portal internal terisolasi dengan proteksi *progressive lockout* bagi Superadmin.</p>
+<p>2. **Dynamic Collateral Protection (Jaminan Dana Nyata):** Setiap penawaran yang diajukan langsung mengunci saldo penawar (*locked balance*) secara dinamis di dompet digital. Dana ini tetap tertahan sepanjang lelang berlangsung hingga tahap *settlement* akhir guna memastikan likuiditas penuh.</p>
+<p>3. **Pencegahan Bot & Kesalahan Input:** Menghilangkan form input teks bebas dengan menerapkan tombol inkremental bertingkat (*discrete increment step buttons*) yang telah ditentukan kurator.</p>
+<p>4. **Anti-Sniping Berbasis Lonjakan Velositas:** Otomatis memperpanjang waktu lelang jika terdeteksi aktivitas penawaran $\ge 10\text{ bid/detik}$ dalam jendela 2 menit terakhir penutupan lelang.</p>
+<p>5. **Streaming Real-Time Berlatensi Rendah:** Mengadopsi teknologi **Server-Sent Events (SSE)** yang ramah *firewall* WAF untuk menyiarkan pembaruan harga ke ribuan pengguna secara serentak dengan latensi $< 300\text{ ms}$.</p>
 <h3>1.3 Scope of the System</h3>
-<ul>
-<li><strong>In-Scope (MVP 1):</strong>
-<ul>
-<li>Dual-login (NIRO SSO &amp; Internal Superadmin dengan progressive lockout).</li>
-<li>Manajemen Role-Based Access Control (Bidder, Auction Manager, Superadmin).</li>
-<li>Manajemen Dompet Agunan Dinamis (Top-up minimum Rp 100.000, penahanan dana lelang, unfreeze otomatis 100% bagi peserta kalah, debit bagi pemenang).</li>
-<li>Kurasi Listing Lot Lelang Barang Mewah (5 kategori, upload gambar biner multipart disimpan di PostgreSQL BLOB <code>BYTEA</code>).</li>
-<li>Dual-Model Bidding (Uncapped Time-Window vs Capped Valuation Ceiling Buy-Out).</li>
-<li>Penawaran tombol diskrit, bot penawar otomatis (<em>Automated Proxy Bidding</em>).</li>
-<li>Anti-Sniping velocity detection &amp; dynamic time extension.</li>
-<li>Background Settlement Daemon berbasis Redis ZSET &amp; distributed lock ACID.</li>
-<li>Streaming telemetri penawaran via Server-Sent Events (SSE).</li>
-</ul>
-</li>
-<li><strong>Out-of-Scope (MVP 1):</strong>
-<ul>
-<li>Pembayaran eksternal kartu kredit pihak ketiga atau cicilan PayLater.</li>
-<li>Pengiriman fisik multi-ekspedisi logistik (hanya sampai pencatatan <em>asset ownership</em> legal).</li>
-<li>Fitur <em>Forgot Password</em> dan <em>Multi-device Session Kickout</em> (ditiadakan sesuai kesepakatan).</li>
-</ul>
-</li>
-</ul>
+<ul><li>**In-Scope (MVP 1):**</li></ul>
+<p>  - Dual-login (NIRO SSO & Internal Superadmin dengan progressive lockout).</p>
+<p>  - Manajemen Role-Based Access Control (Bidder, Auction Manager, Superadmin).</p>
+<p>  - Manajemen Dompet Agunan Dinamis (Top-up minimum Rp 100.000, penahanan dana lelang, unfreeze otomatis 100% bagi peserta kalah, debit bagi pemenang).</p>
+<p>  - Kurasi Listing Lot Lelang Barang Mewah (5 kategori, upload gambar biner multipart disimpan di PostgreSQL BLOB `BYTEA`).</p>
+<p>  - Dual-Model Bidding (Uncapped Time-Window vs Capped Valuation Ceiling Buy-Out).</p>
+<p>  - Penawaran tombol diskrit, bot penawar otomatis (*Automated Proxy Bidding*).</p>
+<p>  - Anti-Sniping velocity detection & dynamic time extension.</p>
+<p>  - Background Settlement Daemon berbasis Redis ZSET & distributed lock ACID.</p>
+<p>  - Streaming telemetri penawaran via Server-Sent Events (SSE).</p>
+<ul><li>**Out-of-Scope (MVP 1):**</li></ul>
+<p>  - Pembayaran eksternal kartu kredit pihak ketiga atau cicilan PayLater.</p>
+<p>  - Pengiriman fisik multi-ekspedisi logistik (hanya sampai pencatatan *asset ownership* legal).</p>
+<p>  - Fitur *Forgot Password* dan *Multi-device Session Kickout* (ditiadakan sesuai kesepakatan).</p>
 <hr>
 <h2>2. Overview</h2>
 <h3>2.1 Document Purpose</h3>
-<p>Dokumen <em>Software Requirement Specification</em> (SRS) ini merinci seluruh persyaratan fungsional, arsitektural, antarmuka pengguna, kontrak API, serta kebutuhan non-fungsional sistem lelang barang mewah. Dokumen ini berfungsi sebagai acuan tunggal yang mengikat bagi Project Manager, Tech Lead, System Analyst, Tim Frontend Next.js, Tim Backend Golang, serta Quality Assurance.</p>
+<p>Dokumen *Software Requirement Specification* (SRS) ini merinci seluruh persyaratan fungsional, arsitektural, antarmuka pengguna, kontrak API, serta kebutuhan non-fungsional sistem lelang barang mewah. Dokumen ini berfungsi sebagai acuan tunggal yang mengikat bagi Project Manager, Tech Lead, System Analyst, Tim Frontend Next.js, Tim Backend Golang, serta Quality Assurance.</p>
 <h3>2.2 Target Audience</h3>
-<ul>
-<li><strong>Delivery &amp; Project Management:</strong> Acuan milestone sprint, pelacakan task, dan <em>story sizing</em>.</li>
-<li><strong>System Analyst &amp; Solution Architect:</strong> Verifikasi kepatuhan prinsip arsitektur dan DDD.</li>
-<li><strong>Frontend Engineers (Next.js):</strong> Acuan <em>UI slicing</em>, <em>state management</em>, interaksi SSE EventSource, dan form validation.</li>
-<li><strong>Backend Engineers (Golang):</strong> Acuan <em>Clean Architecture</em>, <em>raw SQL</em> 70%, skrip Redis Lua, dan standard JSON response envelope.</li>
-<li><strong>QA Engineers:</strong> Acuan penyusunan skenario pengujian TDD dan uji konkurensi $10.000\text{ req/s}$.</li>
-</ul>
+<ul><li>**Delivery & Project Management:** Acuan milestone sprint, pelacakan task, dan *story sizing*.</li></ul>
+<ul><li>**System Analyst & Solution Architect:** Verifikasi kepatuhan prinsip arsitektur dan DDD.</li></ul>
+<ul><li>**Frontend Engineers (Next.js):** Acuan *UI slicing*, *state management*, interaksi SSE EventSource, dan form validation.</li></ul>
+<ul><li>**Backend Engineers (Golang):** Acuan *Clean Architecture*, *raw SQL* 70%, skrip Redis Lua, dan standard JSON response envelope.</li></ul>
+<ul><li>**QA Engineers:** Acuan penyusunan skenario pengujian TDD dan uji konkurensi $10.000\text{ req/s}$.</li></ul>
 <h3>2.3 Document References</h3>
-<ol>
-<li><strong>Brief &amp; Guideline Hackathon 2026:</strong> [PDF Brief](file:///C:/Users/Daniel/.gemini/antigravity/brain/bd980ca4-23ee-44a3-a5ed-230fd0690b42/.user_uploaded/media_1792812187986_0083b4e8.pdf)</li>
-<li><strong>High-Level Design (HLD):</strong> [<code>high-level-design.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/high-level-design.md)</li>
-<li><strong>Low-Level Design (LLD):</strong> [<code>lld-low-level-design.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/lld-low-level-design.md)</li>
-<li><strong>API Contracts Specification:</strong> [<code>api-contracts.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/05_Integration/api-contracts.md)</li>
-<li><strong>Database Schema &amp; DDL:</strong> [<code>database-schema.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/06_Data_Design/database-schema.md)</li>
-<li><strong>Backend Coding Standards:</strong> [<code>backend-coding-standards.md</code>](file:///d:/Projects/Salt-Hackaton-2026/05_Methodologies/backend-coding-standards.md)</li>
-<li><strong>Task Breakdown &amp; Sizing:</strong> [<code>Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx</code>](file:///d:/Projects/Salt-Hackaton-2026/08_Project_Management/Task_Breakdown/Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx)</li>
-</ol>
-<h3>2.4 Terms &amp; Definitions (Glossaries)</h3>
-<table>
-<thead>
-<tr>
-<th style="text-align:center">No</th>
-<th>Istilah</th>
-<th>Kepanjangan</th>
-<th>Definisi Operasional</th>
-</tr>
-</thead>
+<p>1. **Brief & Guideline Hackathon 2026:** [PDF Brief](file:///C:/Users/Daniel/.gemini/antigravity/brain/bd980ca4-23ee-44a3-a5ed-230fd0690b42/.user_uploaded/media_1792812187986_0083b4e8.pdf)</p>
+<p>2. **High-Level Design (HLD):** [`high-level-design.md`](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/high-level-design.md)</p>
+<p>3. **Low-Level Design (LLD):** [`lld-low-level-design.md`](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/lld-low-level-design.md)</p>
+<p>4. **API Contracts Specification:** [`api-contracts.md`](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/05_Integration/api-contracts.md)</p>
+<p>5. **Database Schema & DDL:** [`database-schema.md`](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/06_Data_Design/database-schema.md)</p>
+<p>6. **Backend Coding Standards:** [`backend-coding-standards.md`](file:///d:/Projects/Salt-Hackaton-2026/05_Methodologies/backend-coding-standards.md)</p>
+<p>7. **Task Breakdown & Sizing:** [`Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx`](file:///d:/Projects/Salt-Hackaton-2026/08_Project_Management/Task_Breakdown/Real_Time_Auction_Engine_Task_Breakdown_Sizing.xlsx)</p>
+<h3>2.4 Terms & Definitions (Glossaries)</h3>
+<table class="doc-table">
+<thead><tr><th>No</th><th>Istilah</th><th>Kepanjangan</th><th>Definisi Operasional</th></tr></thead>
 <tbody>
-<tr>
-<td style="text-align:center">1</td>
-<td><strong>NIRO SSO</strong></td>
-<td>NIRO Single Sign-On</td>
-<td>Penyedia identitas terpusat OAuth2/OIDC untuk otentikasi Bidder dan Auction Manager.</td>
-</tr>
-<tr>
-<td style="text-align:center">2</td>
-<td><strong>SSE</strong></td>
-<td>Server-Sent Events</td>
-<td>Protokol streaming data satu arah dari server ke klien via persistent HTTP <code>text/event-stream</code>.</td>
-</tr>
-<tr>
-<td style="text-align:center">3</td>
-<td><strong>BLOB</strong></td>
-<td>Binary Large Object</td>
-<td>Tipe data <code>BYTEA</code> PostgreSQL untuk menyimpan konten biner gambar barang mewah di database.</td>
-</tr>
-<tr>
-<td style="text-align:center">4</td>
-<td><strong>Locked Balance</strong></td>
-<td>Saldo Agunan Tertahan</td>
-<td>Porsi saldo e-wallet penawar yang dikunci saat mengajukan penawaran dan tidak dapat ditarik selama lelang aktif.</td>
-</tr>
-<tr>
-<td style="text-align:center">5</td>
-<td><strong>Anti-Sniping</strong></td>
-<td>Anti-Sniping Engine</td>
-<td>Logika otomasi perpanjangan durasi lot jika terjadi lonjakan velositas penawaran $\ge 10\text{ bid/s}$ di 2 menit akhir.</td>
-</tr>
-<tr>
-<td style="text-align:center">6</td>
-<td><strong>Buy-Out</strong></td>
-<td>Instant Buy-Out</td>
-<td>Mekanisme pembelian langsung pada lelang <em>Capped</em> ketika tawaran menyentuh batas valuasi lelang.</td>
-</tr>
-<tr>
-<td style="text-align:center">7</td>
-<td><strong>Proxy Bidding</strong></td>
-<td>Automated Proxy Bidding</td>
-<td>Bot penawar otomatis yang mewakili pengguna menaikkan harga 1 step increment setiap kali tersalip hingga batas maksimal personal.</td>
-</tr>
-</tbody>
-</table>
+<tr><td>1</td><td>**NIRO SSO**</td><td>NIRO Single Sign-On</td><td>Penyedia identitas terpusat OAuth2/OIDC untuk otentikasi Bidder dan Auction Manager.</td></tr>
+<tr><td>2</td><td>**SSE**</td><td>Server-Sent Events</td><td>Protokol streaming data satu arah dari server ke klien via persistent HTTP `text/event-stream`.</td></tr>
+<tr><td>3</td><td>**BLOB**</td><td>Binary Large Object</td><td>Tipe data `BYTEA` PostgreSQL untuk menyimpan konten biner gambar barang mewah di database.</td></tr>
+<tr><td>4</td><td>**Locked Balance**</td><td>Saldo Agunan Tertahan</td><td>Porsi saldo e-wallet penawar yang dikunci saat mengajukan penawaran dan tidak dapat ditarik selama lelang aktif.</td></tr>
+<tr><td>5</td><td>**Anti-Sniping**</td><td>Anti-Sniping Engine</td><td>Logika otomasi perpanjangan durasi lot jika terjadi lonjakan velositas penawaran $\ge 10\text{ bid/s}$ di 2 menit akhir.</td></tr>
+<tr><td>6</td><td>**Buy-Out**</td><td>Instant Buy-Out</td><td>Mekanisme pembelian langsung pada lelang *Capped* ketika tawaran menyentuh batas valuasi lelang.</td></tr>
+<tr><td>7</td><td>**Proxy Bidding**</td><td>Automated Proxy Bidding</td><td>Bot penawar otomatis yang mewakili pengguna menaikkan harga 1 step increment setiap kali tersalip hingga batas maksimal personal.</td></tr>
+</tbody></table>
 <hr>
 <h2>3. Functional Requirement</h2>
 <h3>3.1 High-Level Functional Diagram</h3>
 <pre><code class="language-mermaid">flowchart TD
-    subgraph Users [&quot;Actors &amp; Identity&quot;]
-        Bidder[&quot;Bidder (Peserta)&quot;]
-        AM[&quot;Auction Manager (Kurator)&quot;]
-        Super[&quot;Superadmin Platform&quot;]
+    subgraph Users ["Actors &amp; Identity"]
+        Bidder["Bidder (Peserta)"]
+        AM["Auction Manager (Kurator)"]
+        Super["Superadmin Platform"]
     end
 
-    subgraph Auth_Module [&quot;Module 1: Authentication &amp; Access Control&quot;]
-        NiroAuth[&quot;NIRO SSO Gateway &amp; Auto-Provisioning&quot;]
-        EmailAuth[&quot;Superadmin Bcrypt &amp; Progressive Lockout&quot;]
-        RoleMgmt[&quot;Role Promotion &amp; Session Revocation (Auto-Logout)&quot;]
+    subgraph Auth_Module ["Module 1: Authentication &amp; Access Control"]
+        NiroAuth["NIRO SSO Gateway &amp; Auto-Provisioning"]
+        EmailAuth["Superadmin Bcrypt &amp; Progressive Lockout"]
+        RoleMgmt["Role Promotion &amp; Session Revocation (Auto-Logout)"]
     end
 
-    subgraph Wallet_Module [&quot;Module 2: Dynamic Collateral E-Wallet&quot;]
-        TopUp[&quot;Deposit Saldo (Min Rp 100.000)&quot;]
-        HoldFund[&quot;Dynamic Hold Allocation (locked_balance)&quot;]
-        ReleaseFund[&quot;Final Settlement Reconciliation (Debit/Release)&quot;]
+    subgraph Wallet_Module ["Module 2: Dynamic Collateral E-Wallet"]
+        TopUp["Deposit Saldo (Min Rp 100.000)"]
+        HoldFund["Dynamic Hold Allocation (locked_balance)"]
+        ReleaseFund["Final Settlement Reconciliation (Debit/Release)"]
     end
 
-    subgraph Catalog_Module [&quot;Module 3: Luxury Lot Catalog &amp; Curation&quot;]
-        CreateLot[&quot;Listing Lot &amp; Binary Upload (Postgres BYTEA)&quot;]
-        PricingRules[&quot;Model Setup (Uncapped vs Capped &amp; Steps)&quot;]
-        MarketGrid[&quot;Marketplace Query with Pagination &amp; Badges&quot;]
+    subgraph Catalog_Module ["Module 3: Luxury Lot Catalog &amp; Curation"]
+        CreateLot["Listing Lot &amp; Binary Upload (Postgres BYTEA)"]
+        PricingRules["Model Setup (Uncapped vs Capped &amp; Steps)"]
+        MarketGrid["Marketplace Query with Pagination &amp; Badges"]
     end
 
-    subgraph Bidding_Module [&quot;Module 4: Real-Time Bidding &amp; Lua Engine&quot;]
-        StepBid[&quot;Discrete Increment Step Button Execution&quot;]
-        ProxyBot[&quot;Autonomous Proxy Bidding Loop&quot;]
-        AntiSnipe[&quot;Velocity Surge Tracker (&gt;= 10 bid/s in 2m window)&quot;]
-        Buyout[&quot;Instant Buyout Ceiling Resolver&quot;]
+    subgraph Bidding_Module ["Module 4: Real-Time Bidding &amp; Lua Engine"]
+        StepBid["Discrete Increment Step Button Execution"]
+        ProxyBot["Autonomous Proxy Bidding Loop"]
+        AntiSnipe["Velocity Surge Tracker (&gt;= 10 bid/s in 2m window)"]
+        Buyout["Instant Buyout Ceiling Resolver"]
     end
 
-    subgraph Streaming_Module [&quot;Module 5: Telemetry &amp; Streaming Hub&quot;]
-        SSEHub[&quot;Server-Sent Events Broadcast Hub (&lt; 300 ms)&quot;]
+    subgraph Streaming_Module ["Module 5: Telemetry &amp; Streaming Hub"]
+        SSEHub["Server-Sent Events Broadcast Hub (&lt; 300 ms)"]
     end
 
     Bidder --&gt; NiroAuth
@@ -431,262 +355,136 @@
     PricingRules --&gt; CreateLot
     ReleaseFund --&gt; Wallet_Module
 </code></pre>
-<h3>3.2 Use Case Specifications &amp; Actor Matrix</h3>
-<table>
-<thead>
-<tr>
-<th>Use Case ID</th>
-<th>Nama Use Case</th>
-<th>Aktor Utama</th>
-<th>Deskripsi Singkat</th>
-<th>Pre-kondisi</th>
-</tr>
-</thead>
+<h3>3.2 Use Case Specifications & Actor Matrix</h3>
+<table class="doc-table">
+<thead><tr><th>Use Case ID</th><th>User Story Ref</th><th>Nama Fitur / Modul</th><th>Aktor Utama</th><th>Total AC</th><th>Story Size</th><th>Deskripsi Fungsional & Prekondisi</th></tr></thead>
 <tbody>
-<tr>
-<td><strong>UC-AUTH-01</strong></td>
-<td>Login NIRO SSO</td>
-<td>Bidder, AM</td>
-<td>Masuk via OAuth2 NIRO. Jika pengguna baru, sistem mendaftarkan role <code>BIDDER</code> secara otomatis.</td>
-<td>Pengguna memiliki akun NIRO aktif.</td>
-</tr>
-<tr>
-<td><strong>UC-AUTH-02</strong></td>
-<td>Login Superadmin</td>
-<td>Superadmin</td>
-<td>Masuk via email &amp; password internal (min 12 char) dengan progressive lockout.</td>
-<td>Kredensial superadmin terdaftar.</td>
-</tr>
-<tr>
-<td><strong>UC-AUTH-03</strong></td>
-<td>Promosi Role User</td>
-<td>Superadmin</td>
-<td>Mengubah role user NIRO menjadi <code>ADMIN</code> dan otomatis logout sesi aktif user.</td>
-<td>Superadmin login; Target user terdaftar.</td>
-</tr>
-<tr>
-<td><strong>UC-WAL-01</strong></td>
-<td>Top-Up E-Wallet</td>
-<td>Bidder</td>
-<td>Menambah saldo likuid penawar dengan nominal minimal Rp 100.000.</td>
-<td>Pengguna berstatus role <code>BIDDER</code>.</td>
-</tr>
-<tr>
-<td><strong>UC-BID-01</strong></td>
-<td>Penawaran Inkremental</td>
-<td>Bidder</td>
-<td>Menawar lot barang mewah menggunakan tombol bertingkat diskrit (tanpa teks bebas).</td>
-<td>Saldo bebas cukup; Lot berstatus <code>ACTIVE</code>.</td>
-</tr>
-<tr>
-<td><strong>UC-BID-02</strong></td>
-<td>Aktivasi Proxy Bid</td>
-<td>Bidder</td>
-<td>Menyetel batas penawaran otomatis agar sistem menawar balik saat tersalip.</td>
-<td>Saldo bebas $\ge$ limit batas proxy.</td>
-</tr>
-<tr>
-<td><strong>UC-BID-03</strong></td>
-<td>Beli Langsung (Buyout)</td>
-<td>Bidder</td>
-<td>Membeli instan lot lelang model Capped pada harga batas valuasi ceiling.</td>
-<td>Saldo bebas $\ge$ harga valuation ceiling.</td>
-</tr>
-<tr>
-<td><strong>UC-LOT-01</strong></td>
-<td>Listing Lot Baru</td>
-<td>AM</td>
-<td>Mengunggah foto biner, menentukan kelipatan tombol bid, harga dasar, dan extend window.</td>
-<td>User berstatus role <code>ADMIN</code>.</td>
-</tr>
-<tr>
-<td><strong>UC-SET-01</strong></td>
-<td>Otomasi Settlement</td>
-<td>System Daemon</td>
-<td>Memotong saldo pemenang, melepas agunan peserta kalah 100%, dan menerbitkan hak milik aset.</td>
-<td>Durasi lelang habis atau buyout tercapai.</td>
-</tr>
-<tr>
-<td><strong>UC-STR-01</strong></td>
-<td>Streaming Live Harga</td>
-<td>Universal</td>
-<td>Menerima pembaruan harga lelang dan timer via Server-Sent Events (SSE).</td>
-<td>Terkoneksi ke internet.</td>
-</tr>
-</tbody>
-</table>
+<tr><td>**UC-AUTH-01**</td><td>**US-AUTH**</td><td>Dual Authentication & Progressive Lockout</td><td>Bidder, AM, Superadmin</td><td>8</td><td>**M (155)**</td><td>Login NIRO SSO untuk Bidder/AM; Email/Pass min. 12 char + progressive lockout (1m/2m/1h) untuk Superadmin; Promosi role trigger auto-logout.</td></tr>
+<tr><td>**UC-WAL-01**</td><td>**US-001**</td><td>E-Wallet Top-Up Journey (Step 1-3)</td><td>Bidder Exclusive</td><td>9</td><td>**M (115)**</td><td>Validasi min. Rp 100.000, kelipatan rupiah utuh, pemilihan channel VA/E-wallet, timer sesi kedaluwarsa, dan isolasi akses non-Bidder.</td></tr>
+<tr><td>**UC-BID-01**</td><td>**US-002**</td><td>Dynamic Collateral Hold During Bidding</td><td>Bidder Exclusive</td><td>4</td><td>**M (175)**</td><td>Validasi ketersediaan saldo likuid; saldo dipindahkan ke locked balance saat menawar dan TETAP TERTAHAN selama lelang berlangsung.</td></tr>
+<tr><td>**UC-BID-02**</td><td>**US-003**</td><td>Incremental Discrete Bidding & Modal Confirm</td><td>Bidder Exclusive</td><td>8</td><td>**M (170)**</td><td>Penawaran menggunakan tombol bertingkat (+Rp 5m/+Rp 10m) tanpa free-text typing, pop-up konfirmasi, dan serialisasi Redis Lua < 5 ms.</td></tr>
+<tr><td>**UC-BID-03**</td><td>**US-004**</td><td>Velocity-Based Anti-Sniping Extension</td><td>Bidder, AM</td><td>3</td><td>**M (115)**</td><td>Deteksi intensitas lonjakan penawaran ($\ge$ 10 hits/s) pada jendela 2 menit akhir untuk memicu perpanjangan waktu dinamis otomatis.</td></tr>
+<tr><td>**UC-BID-04**</td><td>**US-005**</td><td>Instant Buy-Out on Capped Valuation</td><td>Bidder Exclusive</td><td>3</td><td>**M (115)**</td><td>Penyelesaian lelang seketika jika penawar menekan tombol Instant Buy-Out atau mencapai ceiling valuation pada model lelang Capped.</td></tr>
+<tr><td>**UC-BID-05**</td><td>**US-006**</td><td>Autonomous Proxy Bidding Worker</td><td>Bidder Exclusive</td><td>4</td><td>**M (130)**</td><td>Bot penawar otomatis yang mengevaluasi outbid event via Redis stream dan melakukan counter-bid hingga batas limit maksimal.</td></tr>
+<tr><td>**UC-LOT-01**</td><td>**US-007**</td><td>Auction Lot Creation, Rule Form & BLOB</td><td>AM Exclusive</td><td>11</td><td>**M (115)**</td><td>Formulir kurasi lot lelang: input identitas, upload foto biner ke PostgreSQL BYTEA, live preview, pricing rules, dan anti-sniping selector.</td></tr>
+<tr><td>**UC-STR-01**</td><td>**US-008**</td><td>Universal Live Bid & Concurrency Stream</td><td>Universal</td><td>6</td><td>**M (140)**</td><td>Sinkronisasi mutasi harga, countdown timer, dan indikator status via Server-Sent Events (SSE) dengan latensi $< 300\text{ ms}$.</td></tr>
+<tr><td>**UC-SET-01**</td><td>**US-009**</td><td>Automated Settlement & Reconciliation Queue</td><td>AM, Daemon</td><td>6</td><td>**M (200)**</td><td>Background daemon 1s mengeksekusi settlement ACID: debet pemenang, rilis agunan peserta kalah 100%, serta resolusi exception short-payment.</td></tr>
+<tr><td>**UC-CAT-01**</td><td>**US-010**</td><td>Marketplace Catalog & Filtering</td><td>Universal</td><td>12</td><td>**M (165)**</td><td>Galeri katalog barang bernilai tinggi: kategori, pagination, thumbnail Base64, dan filter dinamis sesuai status lelang.</td></tr>
+<tr><td>**UC-HST-01**</td><td>**US-011**</td><td>Participant Bid History & Settlement Detail</td><td>Bidder Exclusive</td><td>10</td><td>**M (140)**</td><td>Dashboard riwayat penawaran: active bids, leading, outbid, won, progress tracker lelang tertutup, dan invoice settlement drawer.</td></tr>
+<tr><td>**UC-DTL-01**</td><td>**US-012**</td><td>Product Detail Page & Live Room SSE</td><td>Universal</td><td>9</td><td>**M (110)**</td><td>Halaman detail lot: Base64 image, authenticity guarantee, chart riwayat harga lelang, tabs menu, dan banner proteksi koneksi terputus.</td></tr>
+<tr><td>**UC-OVR-01**</td><td>**US-013**</td><td>Operations & Market Overview Dashboard</td><td>Universal</td><td>6</td><td>**S (90)**</td><td>Ringkasan metrik makro: Live sync indicator pill, 4 kartu saldo & status bid, watchlist slider ending soon, dan timeline recent activity.</td></tr>
+<tr><td>**UC-LTM-01**</td><td>**US-014**</td><td>Lot Management Catalog Lifecycle Matrix</td><td>AM Exclusive</td><td>8</td><td>**S (65)**</td><td>Manajemen siklus hidup lot: 5 lifecycle tabs (Draft, Scheduled, Active, Closed, Archived), aksi View/Edit/Archive, dan toast notifikasi.</td></tr>
+<tr><td>**UC-MON-01**</td><td>**US-015**</td><td>Live Auction Monitor & Authorized Interventions</td><td>AM Exclusive</td><td>7</td><td>**M (140)**</td><td>Pemantauan operasional mendalam: incoming bid acceleration, unique bidders, p95 latency gateway, serta intervensi (Pause, Flag, Cancel).</td></tr>
+<tr><td>**UC-DIR-01**</td><td>**US-016**</td><td>Participants Directory & Compliance KYC</td><td>AM Exclusive</td><td>6</td><td>**M (140)**</td><td>Direktori peserta lelang: 4 metrik verifikasi, saldo agunan aktif, export data CSV/XLSX, dan kontrol verifikasi KYC.</td></tr>
+</tbody></table>
+<h3>3.2.1 Story Sizing Appraisal & Complexity Matrix</h3>
+<p>Berikut adalah ringkasan hasil kalkulasi bobot estimasi (*Story Sizing Appraisal*) untuk seluruh 17 modul User Story berdasarkan formula parameter standar (*New Technology*, *# Surrounding Involvement*, *Technical Flow Sequences*, *Acceptance Criteria Count*, dan *UI Slicing Complexity*):</p>
+<table class="doc-table">
+<thead><tr><th>Story ID</th><th>User Story Title</th><th>New Tech (15%)</th><th>Surrounding (15%)</th><th>Tech Flow (30%)</th><th>AC Count (25%)</th><th>UI Slicing (15%)</th><th>Total Score</th><th>Final Size</th><th>Story Point (APPS)</th></tr></thead>
+<tbody>
+<tr><td>**US-AUTH**</td><td>Multi-Role Auth & Progressive Lockout</td><td>15 (1)</td><td>30 (2)</td><td>60 (2)</td><td>50 (2)</td><td>0 (0)</td><td>**155**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-001**</td><td>E-Wallet Top-Up Journey (Step 1-3)</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>25 (1)</td><td>0 (0)</td><td>**115**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-002**</td><td>Dynamic Collateral Hold During Bidding</td><td>45 (3)</td><td>15 (1)</td><td>90 (3)</td><td>25 (1)</td><td>0 (0)</td><td>**175**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-003**</td><td>Incremental Bid on Uncapped Auction</td><td>15 (1)</td><td>15 (1)</td><td>90 (3)</td><td>50 (2)</td><td>0 (0)</td><td>**170**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-004**</td><td>Velocity-Based Anti-Sniping Extension</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>25 (1)</td><td>0 (0)</td><td>**115**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-005**</td><td>Instant Buy-Out on Capped Valuation</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>25 (1)</td><td>0 (0)</td><td>**115**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-006**</td><td>Automated Proxy Bidding Bot</td><td>0 (0)</td><td>15 (1)</td><td>90 (3)</td><td>25 (1)</td><td>0 (0)</td><td>**130**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-007**</td><td>Lot Creation, Rules & Form Layout</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>25 (1)</td><td>0 (0)</td><td>**115**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-008**</td><td>Universal Live Bid & Concurrency Stream</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>50 (2)</td><td>0 (0)</td><td>**140**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-009**</td><td>Settlement & Collateral Reconciliation</td><td>15 (1)</td><td>15 (1)</td><td>120 (4)</td><td>50 (2)</td><td>0 (0)</td><td>**200**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-010**</td><td>View Item Marketplace & Catalog</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>75 (3)</td><td>0 (0)</td><td>**165**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-011**</td><td>Participant Bid History & Settlement</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>50 (2)</td><td>0 (0)</td><td>**140**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-012**</td><td>Product Detail & Live Room SSE</td><td>15 (1)</td><td>15 (1)</td><td>30 (1)</td><td>50 (2)</td><td>0 (0)</td><td>**110**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-013**</td><td>Operations & Market Overview</td><td>0 (0)</td><td>15 (1)</td><td>0 (0)</td><td>75 (3)</td><td>0 (0)</td><td>**90**</td><td>**S**</td><td>2.5</td></tr>
+<tr><td>**US-014**</td><td>Lot Management Catalog Lifecycle</td><td>0 (0)</td><td>15 (1)</td><td>0 (0)</td><td>50 (2)</td><td>0 (0)</td><td>**65**</td><td>**S**</td><td>2.5</td></tr>
+<tr><td>**US-015**</td><td>Live Auction Monitor & Interventions</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>50 (2)</td><td>0 (0)</td><td>**140**</td><td>**M**</td><td>2.5</td></tr>
+<tr><td>**US-016**</td><td>Participants Directory & Compliance</td><td>15 (1)</td><td>15 (1)</td><td>60 (2)</td><td>50 (2)</td><td>0 (0)</td><td>**140**</td><td>**M**</td><td>2.5</td></tr>
+</tbody></table>
 <h3>3.3 Detailed User Flow (Core Scenarios)</h3>
-<ol>
-<li><strong>Alur Login &amp; Auto-Provisioning NIRO:</strong>
-<code>FE Request Redirect URL</code> $\rightarrow$ <code>User Login di NIRO</code> $\rightarrow$ <code>FE Terima niro_token</code> $\rightarrow$ <code>POST /api/v1/auth/login/niro</code> $\rightarrow$ <code>BE Validasi ke NIRO</code> $\rightarrow$ <code>Cek DB users</code>:
-<ul>
-<li>Jika belum ada: Insert user (role <code>BIDDER</code>) + Buat dompet saldo 0 $\rightarrow$ Return 201 Created.</li>
-<li>Jika sudah ada: Ambil data user &amp; role terkini $\rightarrow$ Return 200 OK.</li>
-</ul>
-</li>
-<li><strong>Alur Penawaran Atomik Hot-Path (Inkremental):</strong>
-<code>Bidder Klik Tombol (+Rp 5.000.000)</code> $\rightarrow$ <code>Modal Konfirmasi Muncul</code> $\rightarrow$ <code>Bidder Klik Confirm</code> $\rightarrow$ <code>POST /api/v1/auctions/:id/bids</code> $\rightarrow$ <code>Redis Lua bid_placement.lua</code>:
-<ul>
-<li>Validasi saldo <code>available_balance &gt;= target_bid</code>.</li>
-<li>Kurangi <code>available_balance</code>, pindahkan ke <code>locked_balance</code>.</li>
-<li>Update <code>current_price</code> dan <code>highest_bidder_id</code>.</li>
-<li>Cek Anti-Sniping: jika sisa waktu $\le 120\text{s}$ dan velositas $\ge 10\text{ bid/s}$, tambahkan <code>end_time = end_time + extend_minutes</code>.</li>
-<li>Cek Buy-Out: jika <code>new_price &gt;= valuation_ceiling</code>, ubah status lot jadi <code>CLOSED_AWARDED</code>.</li>
-<li>Terbitkan pesan event ke Redis Pub/Sub $\rightarrow$ Didistribusikan oleh SSE Hub ke seluruh klien dalam $&lt; 300\text{ ms}$.</li>
-</ul>
-</li>
-</ol>
+<p>1. **Alur Login & Auto-Provisioning NIRO:**</p>
+<p>   `FE Request Redirect URL` $\rightarrow$ `User Login di NIRO` $\rightarrow$ `FE Terima niro_token` $\rightarrow$ `POST /api/v1/auth/login/niro` $\rightarrow$ `BE Validasi ke NIRO` $\rightarrow$ `Cek DB users`:</p>
+<p>   - Jika belum ada: Insert user (role `BIDDER`) + Buat dompet saldo 0 $\rightarrow$ Return 201 Created.</p>
+<p>   - Jika sudah ada: Ambil data user & role terkini $\rightarrow$ Return 200 OK.</p>
+<p>2. **Alur Penawaran Atomik Hot-Path (Inkremental):**</p>
+<p>   `Bidder Klik Tombol (+Rp 5.000.000)` $\rightarrow$ `Modal Konfirmasi Muncul` $\rightarrow$ `Bidder Klik Confirm` $\rightarrow$ `POST /api/v1/auctions/:id/bids` $\rightarrow$ `Redis Lua bid_placement.lua`:</p>
+<p>   - Validasi saldo `available_balance >= target_bid`.</p>
+<p>   - Kurangi `available_balance`, pindahkan ke `locked_balance`.</p>
+<p>   - Update `current_price` dan `highest_bidder_id`.</p>
+<p>   - Cek Anti-Sniping: jika sisa waktu $\le 120\text{s}$ dan velositas $\ge 10\text{ bid/s}$, tambahkan `end_time = end_time + extend_minutes`.</p>
+<p>   - Cek Buy-Out: jika `new_price >= valuation_ceiling`, ubah status lot jadi `CLOSED_AWARDED`.</p>
+<p>   - Terbitkan pesan event ke Redis Pub/Sub $\rightarrow$ Didistribusikan oleh SSE Hub ke seluruh klien dalam $< 300\text{ ms}$.</p>
 <h3>3.4 Business Rules Inventory (BR-XXX)</h3>
-<ul>
-<li><strong>BR-001 (Otentikasi Ganda):</strong> Bidder dan Auction Manager wajib menggunakan NIRO SSO. Superadmin login via email internal. Upaya login akun Bidder/AM melalui form email ditolak mentah-mentah.</li>
-<li><strong>BR-002 (Progressive Lockout Superadmin):</strong> Gagal login berturut-turut pada Superadmin memicu penguncian bertingkat: 3x gagal pertama = 1 menit; 3x gagal kedua = 2 menit; 3x gagal ketiga = 1 jam.</li>
-<li><strong>BR-003 (Auto-Logout Promosi Role):</strong> Saat user dipromosikan ke <code>ADMIN</code> oleh Superadmin, sistem secara instan menaikkan <code>token_version</code> di Redis, membatalkan token sesi aktif, dan memaksa user untuk login kembali.</li>
-<li><strong>BR-004 (Minimum Top-Up):</strong> Nilai deposit e-wallet minimal adalah Rp 100.000. AM dan Superadmin dilarang melakukan top-up dompet (HTTP 403).</li>
-<li><strong>BR-005 (Penahanan Agunan Dinamis):</strong> Saldo pengguna tidak ditahan secara pasif di awal, melainkan hanya saat mengajukan penawaran. Saldo penawar yang tersalip tetap tertahan (<em>locked</em>) sepanjang lelang aktif hingga tahap penyelesaian (<em>settlement</em>).</li>
-<li><strong>BR-006 (Pencegahan Typo / Tombol Diskrit):</strong> Input penawaran wajib menggunakan tombol kelipatan bertingkat (<code>allowed_increment_steps</code>). Dilarang keras menyediakan form input teks bebas.</li>
-<li><strong>BR-007 (Ketentuan Anti-Sniping):</strong> Berlaku hanya pada 2 menit terakhir (<code>remaining_time &lt;= 120s</code>). Pemicu ekstensi membutuhkan intensitas lonjakan penawaran $\ge 10\text{ bid/detik}$.</li>
-<li><strong>BR-008 (Tipe Data Moneter):</strong> Seluruh variabel moneter finansial (saldo, harga, kelipatan, ceiling) wajib dikalkulasi dan diserialisasi menggunakan tipe data <strong><code>float64</code></strong>.</li>
-<li><strong>BR-009 (Penyimpanan Media Mandiri):</strong> Gambar aset lelang diunggah sebagai berkas biner multipart, disimpan dalam kolom <code>BYTEA</code> PostgreSQL (BLOB), dan disajikan kembali sebagai string Base64 terkompresi.</li>
-</ul>
+<ul><li>**BR-001 (Otentikasi Ganda):** Bidder dan Auction Manager wajib menggunakan NIRO SSO. Superadmin login via email internal. Upaya login akun Bidder/AM melalui form email ditolak mentah-mentah.</li></ul>
+<ul><li>**BR-002 (Progressive Lockout Superadmin):** Gagal login berturut-turut pada Superadmin memicu penguncian bertingkat: 3x gagal pertama = 1 menit; 3x gagal kedua = 2 menit; 3x gagal ketiga = 1 jam.</li></ul>
+<ul><li>**BR-003 (Auto-Logout Promosi Role):** Saat user dipromosikan ke `ADMIN` oleh Superadmin, sistem secara instan menaikkan `token_version` di Redis, membatalkan token sesi aktif, dan memaksa user untuk login kembali.</li></ul>
+<ul><li>**BR-004 (Minimum Top-Up):** Nilai deposit e-wallet minimal adalah Rp 100.000. AM dan Superadmin dilarang melakukan top-up dompet (HTTP 403).</li></ul>
+<ul><li>**BR-005 (Penahanan Agunan Dinamis):** Saldo pengguna tidak ditahan secara pasif di awal, melainkan hanya saat mengajukan penawaran. Saldo penawar yang tersalip tetap tertahan (*locked*) sepanjang lelang aktif hingga tahap penyelesaian (*settlement*).</li></ul>
+<ul><li>**BR-006 (Pencegahan Typo / Tombol Diskrit):** Input penawaran wajib menggunakan tombol kelipatan bertingkat (`allowed_increment_steps`). Dilarang keras menyediakan form input teks bebas.</li></ul>
+<ul><li>**BR-007 (Ketentuan Anti-Sniping):** Berlaku hanya pada 2 menit terakhir (`remaining_time <= 120s`). Pemicu ekstensi membutuhkan intensitas lonjakan penawaran $\ge 10\text{ bid/detik}$.</li></ul>
+<ul><li>**BR-008 (Tipe Data Moneter):** Seluruh variabel moneter finansial (saldo, harga, kelipatan, ceiling) wajib dikalkulasi dan diserialisasi menggunakan tipe data **`float64`**.</li></ul>
+<ul><li>**BR-009 (Penyimpanan Media Mandiri):** Gambar aset lelang diunggah sebagai berkas biner multipart, disimpan dalam kolom `BYTEA` PostgreSQL (BLOB), dan disajikan kembali sebagai string Base64 terkompresi.</li></ul>
 <h3>3.5 Functional Requirements Inventory (FR-XXX)</h3>
-<table>
-<thead>
-<tr>
-<th>ID Kebutuhan</th>
-<th>Deskripsi Fungsional</th>
-<th>Modul Terkait</th>
-</tr>
-</thead>
+<table class="doc-table">
+<thead><tr><th>ID Kebutuhan</th><th>Deskripsi Fungsional</th><th>Modul Terkait</th></tr></thead>
 <tbody>
-<tr>
-<td><strong>FR-AUTH-001</strong></td>
-<td>Sistem mampu mengembalikan URL otorisasi resmi NIRO SSO beserta CSRF state token.</td>
-<td>Autentikasi</td>
-</tr>
-<tr>
-<td><strong>FR-AUTH-002</strong></td>
-<td>Sistem mampu memvalidasi token NIRO dan mendaftarkan user baru secara transparan (<em>auto-provisioning</em>).</td>
-<td>Autentikasi</td>
-</tr>
-<tr>
-<td><strong>FR-AUTH-003</strong></td>
-<td>Sistem mampu mengunci akun Superadmin secara bertingkat saat terjadi kesalahan password berulang.</td>
-<td>Autentikasi</td>
-</tr>
-<tr>
-<td><strong>FR-AUTH-004</strong></td>
-<td>Sistem mampu membatalkan sesi aktif user ketika perannya diubah menjadi Auction Manager.</td>
-<td>Otorisasi RBAC</td>
-</tr>
-<tr>
-<td><strong>FR-WAL-001</strong></td>
-<td>Sistem mampu menambah saldo e-wallet penawar dan mencatat mutasi jurnal <em>immutable ledger</em>.</td>
-<td>E-Wallet</td>
-</tr>
-<tr>
-<td><strong>FR-WAL-002</strong></td>
-<td>Sistem mampu mengunci saldo bebas (<em>available</em>) ke saldo tertahan (<em>locked</em>) saat penawaran diajukan.</td>
-<td>E-Wallet</td>
-</tr>
-<tr>
-<td><strong>FR-BID-001</strong></td>
-<td>Sistem mampu mengeksekusi penawaran inkremental diskrit secara serial dan atomik melalui skrip Redis Lua.</td>
-<td>Bidding Engine</td>
-</tr>
-<tr>
-<td><strong>FR-BID-002</strong></td>
-<td>Sistem mampu mendeteksi batas valuasi lelang model Capped dan menutup lelang secara instan (<em>buyout</em>).</td>
-<td>Bidding Engine</td>
-</tr>
-<tr>
-<td><strong>FR-BID-003</strong></td>
-<td>Sistem mampu mengevaluasi aturan proxy bidding dan mengajukan counter-bid otomatis saat tersalip.</td>
-<td>Proxy Worker</td>
-</tr>
-<tr>
-<td><strong>FR-LOT-001</strong></td>
-<td>Sistem mampu menerima upload gambar multipart dan menyimpannya sebagai BLOB <code>BYTEA</code> di database.</td>
-<td>Katalog Lelang</td>
-</tr>
-<tr>
-<td><strong>FR-LOT-002</strong></td>
-<td>Sistem mampu menyajikan daftar katalog lelang aktif lengkap dengan pagination metadata terstandarisasi.</td>
-<td>Katalog Lelang</td>
-</tr>
-<tr>
-<td><strong>FR-SET-001</strong></td>
-<td>Sistem background daemon mampu mendeteksi lelang kedaluwarsa via Redis ZSET dan mengeksekusi settlement ACID.</td>
-<td>Settlement Daemon</td>
-</tr>
-<tr>
-<td><strong>FR-STR-001</strong></td>
-<td>Sistem mampu menyiarkan mutasi harga secara persisten ke seluruh viewer via Server-Sent Events (SSE).</td>
-<td>Streaming Engine</td>
-</tr>
-</tbody>
-</table>
+<tr><td>**FR-AUTH-001**</td><td>Sistem mampu mengembalikan URL otorisasi resmi NIRO SSO beserta CSRF state token.</td><td>Autentikasi</td></tr>
+<tr><td>**FR-AUTH-002**</td><td>Sistem mampu memvalidasi token NIRO dan mendaftarkan user baru secara transparan (*auto-provisioning*).</td><td>Autentikasi</td></tr>
+<tr><td>**FR-AUTH-003**</td><td>Sistem mampu mengunci akun Superadmin secara bertingkat saat terjadi kesalahan password berulang.</td><td>Autentikasi</td></tr>
+<tr><td>**FR-AUTH-004**</td><td>Sistem mampu membatalkan sesi aktif user ketika perannya diubah menjadi Auction Manager.</td><td>Otorisasi RBAC</td></tr>
+<tr><td>**FR-WAL-001**</td><td>Sistem mampu menambah saldo e-wallet penawar dan mencatat mutasi jurnal *immutable ledger*.</td><td>E-Wallet</td></tr>
+<tr><td>**FR-WAL-002**</td><td>Sistem mampu mengunci saldo bebas (*available*) ke saldo tertahan (*locked*) saat penawaran diajukan.</td><td>E-Wallet</td></tr>
+<tr><td>**FR-BID-001**</td><td>Sistem mampu mengeksekusi penawaran inkremental diskrit secara serial dan atomik melalui skrip Redis Lua.</td><td>Bidding Engine</td></tr>
+<tr><td>**FR-BID-002**</td><td>Sistem mampu mendeteksi batas valuasi lelang model Capped dan menutup lelang secara instan (*buyout*).</td><td>Bidding Engine</td></tr>
+<tr><td>**FR-BID-003**</td><td>Sistem mampu mengevaluasi aturan proxy bidding dan mengajukan counter-bid otomatis saat tersalip.</td><td>Proxy Worker</td></tr>
+<tr><td>**FR-LOT-001**</td><td>Sistem mampu menerima upload gambar multipart dan menyimpannya sebagai BLOB `BYTEA` di database.</td><td>Katalog Lelang</td></tr>
+<tr><td>**FR-LOT-002**</td><td>Sistem mampu menyajikan daftar katalog lelang aktif lengkap dengan pagination metadata terstandarisasi.</td><td>Katalog Lelang</td></tr>
+<tr><td>**FR-SET-001**</td><td>Sistem background daemon mampu mendeteksi lelang kedaluwarsa via Redis ZSET dan mengeksekusi settlement ACID.</td><td>Settlement Daemon</td></tr>
+<tr><td>**FR-STR-001**</td><td>Sistem mampu menyiarkan mutasi harga secara persisten ke seluruh viewer via Server-Sent Events (SSE).</td><td>Streaming Engine</td></tr>
+</tbody></table>
 <hr>
 <h2>4. End – User Requirement</h2>
-<h3>4.1 UI Wireframe &amp; Design Specifications</h3>
-<p>Sistem antarmuka pengguna berbasis <strong>Next.js 14 Web Application</strong> dengan antarmuka responsif sesuai desain Figma:</p>
-<ol>
-<li><strong>Marketplace Catalog Grid:</strong>
-<ul>
-<li>Menampilkan kartu lot barang mewah (Foto Base64, Kategori Aset, Judul Lot, Base Price, Latest Bid, Jumlah Bid, Countdown Timer Aktif, Heart Watchlist Icon, dan Tombol “View Detail”).</li>
-<li>Status badge kontekstual: <code>Active</code> (Hijau), <code>Leading</code> (Biru), <code>Ending Soon</code> (Kuning), <code>Extended</code> (Oranye), <code>Scheduled</code> (Abu-abu).</li>
-<li>Kontrol pagination di footer (<code>Previous</code>, <code>Page X of Y</code>, <code>Next</code>).</li>
-</ul>
-</li>
-<li><strong>Product Detail Page (Live Bidding Room):</strong>
-<ul>
-<li>Area galeri foto produk resolusi tinggi bersumber dari Base64 PostgreSQL BLOB.</li>
-<li>Tabs informasi: <em>Details</em>, <em>Bidders</em>, <em>Bid History</em>, <em>Documents / Certificate of Authenticity</em>.</li>
-<li>Countdown timer sinkron server dengan indikator visual <em>critical zone</em>.</li>
-<li>Panel kanan: Tombol penawaran diskrit (+Rp 5.000.000, +Rp 10.000.000), Tombol Beli Langsung (Buyout) jika model Capped.</li>
-<li>Autonomous Bidding Card: Toggle Switch (Start/Pause/Stop) dan input limit maksimum.</li>
-<li>Modal Konfirmasi Penawaran: Menampilkan ringkasan lot, nominal bid, dan info saldo dompet sebelum eksekusi.</li>
-</ul>
-</li>
-<li><strong>Bid History &amp; Settlement Page:</strong>
-<ul>
-<li>4 Widget ringkasan metrik: <em>Active Bids</em>, <em>Leading</em>, <em>Outbid</em>, <em>Won / Settled</em>.</li>
-<li>Tabel riwayat penawaran interaktif dan filter status tabs (<em>All</em>, <em>Active Bids</em>, <em>Won</em>, <em>Lost</em>).</li>
-<li>Sidebar rincian penyelesaian (<em>Settlement Detail</em>): Hammer price, Buyer premium, Agunan yang diterapkan, dan status pencairan.</li>
-</ul>
-</li>
-</ol>
-<h3>4.2 Form Inputs, Validations &amp; State Handling</h3>
-<ul>
-<li><strong>Form Top-Up:</strong> Validasi input angka bulat positif bertipe <code>float64</code>, nominal $\ge \text{Rp } 100.000$. Menampilkan <em>chips quick-select</em> (+100k, +500k, +1m, +5m).</li>
-<li><strong>Form Pembuatan Lot (Admin):</strong> Validasi seluruh field wajib (Judul, Kategori dari 5 enum, Deskripsi, Starting Price, Allowed Increments, File gambar binary biner $\le 5\text{ MB}$, Durasi jendela lelang, dan Durasi Anti-Sniping menit).</li>
-</ul>
-<h3>4.3 Error Handling &amp; Edge Cases in UI</h3>
-<ul>
-<li><strong>Koneksi Jaringan Terputus (Network Interrupted):</strong>
-<ul>
-<li>Muncul banner peringatan kuning di bagian atas: <em>“Live prices may be outdated. Reconnecting… Do not assume a submitted bid has failed or succeeded.”</em></li>
-<li>Tombol manual <em>“Retry now”</em> untuk memicu inisialisasi ulang koneksi EventSource SSE.</li>
-</ul>
-</li>
-<li><strong>Saldo Tidak Cukup:</strong> Tombol bid dinonaktifkan (<em>disabled</em>) dengan teks keterangan merah: <em>“Insufficient available balance. Please top up.”</em></li>
-<li><strong>Sesi Kedaluwarsa / Auto-Logout:</strong> Muncul modal dialog penjelas bahwa peran akun telah diperbarui, lalu mengarahkan pengguna secara otomatis ke halaman login NIRO SSO.</li>
-</ul>
+<h3>4.1 UI Wireframe & Design Specifications</h3>
+<p>Sistem antarmuka pengguna berbasis **Next.js 14 Web Application** dengan antarmuka responsif sesuai desain Figma:</p>
+<p>1. **Marketplace Catalog Grid:**</p>
+<p>   - Menampilkan kartu lot barang mewah (Foto Base64, Kategori Aset, Judul Lot, Base Price, Latest Bid, Jumlah Bid, Countdown Timer Aktif, Heart Watchlist Icon, dan Tombol "View Detail").</p>
+<p>   - Status badge kontekstual: `Active` (Hijau), `Leading` (Biru), `Ending Soon` (Kuning), `Extended` (Oranye), `Scheduled` (Abu-abu).</p>
+<p>   - Kontrol pagination di footer (`Previous`, `Page X of Y`, `Next`).</p>
+<p>2. **Product Detail Page (Live Bidding Room):**</p>
+<p>   - Area galeri foto produk resolusi tinggi bersumber dari Base64 PostgreSQL BLOB.</p>
+<p>   - Tabs informasi: *Details*, *Bidders*, *Bid History*, *Documents / Certificate of Authenticity*.</p>
+<p>   - Countdown timer sinkron server dengan indikator visual *critical zone*.</p>
+<p>   - Panel kanan: Tombol penawaran diskrit (+Rp 5.000.000, +Rp 10.000.000), Tombol Beli Langsung (Buyout) jika model Capped.</p>
+<p>   - Autonomous Bidding Card: Toggle Switch (Start/Pause/Stop) dan input limit maksimum.</p>
+<p>   - Modal Konfirmasi Penawaran: Menampilkan ringkasan lot, nominal bid, dan info saldo dompet sebelum eksekusi.</p>
+<p>3. **Bid History & Settlement Page:**</p>
+<p>   - 4 Widget ringkasan metrik: *Active Bids*, *Leading*, *Outbid*, *Won / Settled*.</p>
+<p>   - Tabel riwayat penawaran interaktif dan filter status tabs (*All*, *Active Bids*, *Won*, *Lost*).</p>
+<p>   - Sidebar rincian penyelesaian (*Settlement Detail*): Hammer price, Buyer premium, Agunan yang diterapkan, dan status pencairan.</p>
+<h3>4.2 Form Inputs, Validations & State Handling</h3>
+<ul><li>**Form Top-Up:** Validasi input angka bulat positif bertipe `float64`, nominal $\ge \text{Rp } 100.000$. Menampilkan *chips quick-select* (+100k, +500k, +1m, +5m).</li></ul>
+<ul><li>**Form Pembuatan Lot (Admin):** Validasi seluruh field wajib (Judul, Kategori dari 5 enum, Deskripsi, Starting Price, Allowed Increments, File gambar binary biner $\le 5\text{ MB}$, Durasi jendela lelang, dan Durasi Anti-Sniping menit).</li></ul>
+<h3>4.3 Error Handling & Edge Cases in UI</h3>
+<ul><li>**Koneksi Jaringan Terputus (Network Interrupted):**</li></ul>
+<p>  - Muncul banner peringatan kuning di bagian atas: *"Live prices may be outdated. Reconnecting... Do not assume a submitted bid has failed or succeeded."*</p>
+<p>  - Tombol manual *"Retry now"* untuk memicu inisialisasi ulang koneksi EventSource SSE.</p>
+<ul><li>**Saldo Tidak Cukup:** Tombol bid dinonaktifkan (*disabled*) dengan teks keterangan merah: *"Insufficient available balance. Please top up."*</li></ul>
+<ul><li>**Sesi Kedaluwarsa / Auto-Logout:** Muncul modal dialog penjelas bahwa peran akun telah diperbarui, lalu mengarahkan pengguna secara otomatis ke halaman login NIRO SSO.</li></ul>
 <hr>
 <h2>5. Architecture Diagram</h2>
 <h3>5.1 High-Level System Architecture Diagram</h3>
-<p>Topologi arsitektur sistem mengacu pada standar <em>Enterprise Multi-Tier Architecture</em>:</p>
+<p>Topologi arsitektur sistem mengacu pada standar *Enterprise Multi-Tier Architecture*:</p>
 <pre><code class="language-mermaid">flowchart TD
-    Client[&quot;Client Tier (Next.js 14 Web Portal / Mobile)&quot;]
-    DNS[&quot;Enterprise DNS (auction.luxury.salt.id)&quot;]
-    F5[&quot;External Perimeter: F5 BIG-IP WAF (SSL :443)&quot;]
-    DMZ[&quot;DMZ Tier: Reverse Proxy &amp; Rate Limiter Nodes&quot;]
-    InternalLB[&quot;Internal Load Balancer (Dual-Site :10443)&quot;]
-    Gateway[&quot;Ingress Gateway Nodes (Port 443 HTTPS)&quot;]
-    K8s[&quot;On-Premise Dual-Site Kubernetes Cluster (Golang 20 Pods Mesh)&quot;]
-    Redis[&quot;In-Memory Tier: Redis 7 Cluster (bid_placement.lua)&quot;]
-    DB[(&quot;Persistence Tier: PostgreSQL 16 (ACID Ledger &amp; BYTEA BLOB)&quot;)]
-    NIRO[&quot;External Identity: NIRO SSO Server&quot;]
-    SSE[&quot;Streaming Engine: Server-Sent Events (SSE HTTP/2 Hub)&quot;]
+    Client["Client Tier (Next.js 14 Web Portal / Mobile)"]
+    DNS["Enterprise DNS (auction.luxury.salt.id)"]
+    F5["External Perimeter: F5 BIG-IP WAF (SSL :443)"]
+    DMZ["DMZ Tier: Reverse Proxy &amp; Rate Limiter Nodes"]
+    InternalLB["Internal Load Balancer (Dual-Site :10443)"]
+    Gateway["Ingress Gateway Nodes (Port 443 HTTPS)"]
+    K8s["On-Premise Dual-Site Kubernetes Cluster (Golang 20 Pods Mesh)"]
+    Redis["In-Memory Tier: Redis 7 Cluster (bid_placement.lua)"]
+    DB[("Persistence Tier: PostgreSQL 16 (ACID Ledger &amp; BYTEA BLOB)")]
+    NIRO["External Identity: NIRO SSO Server"]
+    SSE["Streaming Engine: Server-Sent Events (SSE HTTP/2 Hub)"]
 
     Client --&gt; DNS --&gt; F5 --&gt; DMZ --&gt; InternalLB --&gt; Gateway --&gt; K8s
     K8s &lt;--&gt; Redis
@@ -695,7 +493,7 @@
     K8s --&gt; SSE
     SSE -.-&gt;|text/event-stream &lt; 300ms| Client
 </code></pre>
-<p><em>(Diagram arsitektur infrastruktur terperinci versi vektor resolusi tinggi 2500x1902 tersedia di file [<code>auction-platform-architecture.svg</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/Diagrams/auction-platform-architecture.svg)).</em></p>
+<p>*(Diagram arsitektur infrastruktur terperinci versi vektor resolusi tinggi 2500x1902 tersedia di file [`auction-platform-architecture.svg`](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/Diagrams/auction-platform-architecture.svg)).*</p>
 <h3>5.2 Low-Level Design Activity Diagram (Bidding Hot-Path)</h3>
 <pre><code class="language-mermaid">sequenceDiagram
     autonumber
@@ -708,7 +506,7 @@
 
     Bidder-&gt;&gt;FE: Klik Tombol Increment (+Rp 5.000.000)
     FE-&gt;&gt;FE: Tampilkan Modal Konfirmasi Penawaran
-    Bidder-&gt;&gt;FE: Klik &quot;Confirm Bid&quot;
+    Bidder-&gt;&gt;FE: Klik "Confirm Bid"
     FE-&gt;&gt;API: POST /api/v1/auctions/:id/bids {increment: 5000000.00}
     API-&gt;&gt;Redis: EVALSHA bid_placement.lua (user_id, lot_id, new_price)
     
@@ -726,160 +524,66 @@
     Redis--&gt;&gt;SSE: Ingest Event Frame
     SSE--&gt;&gt;FE: Stream Push ke Semua Klien (&lt; 300 ms)
     API-)DB: Async Insert ke tabel bids
-    API--&gt;&gt;FE: 200 OK {&quot;status&quot;: &quot;success&quot;, &quot;data&quot;: {...}}
-    FE--&gt;&gt;Bidder: Tampilkan Status &quot;You are the Highest Bidder&quot;
+    API--&gt;&gt;FE: 200 OK {"status": "success", "data": {...}}
+    FE--&gt;&gt;Bidder: Tampilkan Status "You are the Highest Bidder"
 </code></pre>
 <hr>
 <h2>6. Functional API</h2>
 <h3>6.1 Surrounding System Dependencies</h3>
-<ol>
-<li><strong>NIRO SSO Server:</strong> Penyedia layanan otentikasi identitas eksternal berbasis OAuth2/OIDC (URL authorization, token verification, dan user profile extraction).</li>
-<li><strong>PostgreSQL 16 Relational Engine:</strong> Authoritative persistent ledger yang menyimpan data user, saldo moneter, audit bid, kepemilikan aset, dan file gambar biner <code>BYTEA</code>.</li>
-<li><strong>Redis 7 In-Memory Cluster:</strong> Database memori berkecepatan tinggi untuk eksekusi skrip Lua atomik, pelacak counter velositas, dan ZSET indeks expiry lelang.</li>
-</ol>
+<p>1. **NIRO SSO Server:** Penyedia layanan otentikasi identitas eksternal berbasis OAuth2/OIDC (URL authorization, token verification, dan user profile extraction).</p>
+<p>2. **PostgreSQL 16 Relational Engine:** Authoritative persistent ledger yang menyimpan data user, saldo moneter, audit bid, kepemilikan aset, dan file gambar biner `BYTEA`.</p>
+<p>3. **Redis 7 In-Memory Cluster:** Database memori berkecepatan tinggi untuk eksekusi skrip Lua atomik, pelacak counter velositas, dan ZSET indeks expiry lelang.</p>
 <h3>6.2 REST API Endpoints Specification</h3>
 <p>Seluruh endpoint menggunakan format response envelope standar backend:</p>
-<ul>
-<li>Sukses: <code>{&quot;status&quot;: &quot;success&quot;, &quot;data&quot;: { ... }}</code></li>
-<li>Gagal: <code>{&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;...&quot;, &quot;message&quot;: &quot;...&quot;}}</code></li>
-</ul>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Endpoint</th>
-<th>Role Akses</th>
-<th>Fungsi &amp; Kontrak Utama</th>
-</tr>
-</thead>
+<ul><li>Sukses: `{"status": "success", "data": { ... }}`</li></ul>
+<ul><li>Gagal: `{"status": "error", "error": {"code": "...", "message": "..."}}`</li></ul>
+<table class="doc-table">
+<thead><tr><th>Method</th><th>Endpoint</th><th>Role Akses</th><th>Fungsi & Kontrak Utama</th></tr></thead>
 <tbody>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/auth/niro/authorize-url</code></td>
-<td>Public</td>
-<td>Mendapatkan URL redirect SSO NIRO beserta state parameter CSRF.</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/auth/login/niro</code></td>
-<td>Public</td>
-<td>Tukar token NIRO; auto-register jika baru (role <code>BIDDER</code>) atau buat sesi JWT jika sudah ada.</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/auth/login/email</code></td>
-<td>Public</td>
-<td>Login email &amp; password (min. 12 char) khusus <code>SUPERADMIN</code> dengan progressive lockout.</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/admin/users</code></td>
-<td><code>SUPERADMIN</code></td>
-<td>Mengambil daftar user terdaftar NIRO (lengkap dengan pagination meta).</td>
-</tr>
-<tr>
-<td><code>PATCH</code></td>
-<td><code>/api/v1/admin/users/:id/role</code></td>
-<td><code>SUPERADMIN</code></td>
-<td>Mengubah role user ke <code>ADMIN</code> dan otomatis memicu <em>session revocation</em> (auto-logout).</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/wallet/me</code></td>
-<td><code>BIDDER</code></td>
-<td>Mengambil saldo bebas likuid (<code>available_balance</code>) dan agunan (<code>locked_balance</code>).</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/wallet/topup</code></td>
-<td><code>BIDDER</code></td>
-<td>Menambah saldo deposit e-wallet penawar (minimal Rp 100.000).</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/wallet/transactions</code></td>
-<td><code>BIDDER</code></td>
-<td>Mengambil riwayat mutasi jurnal keuangan penawar berhalaman (<em>pagination</em>).</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/auctions/active</code></td>
-<td>Public</td>
-<td>Menampilkan katalog lelang aktif (gambar thumbnail Base64 &amp; pagination meta).</td>
-</tr>
-<tr>
-<td><code>GET</code></td>
-<td><code>/api/v1/auctions/:id</code></td>
-<td>Public</td>
-<td>Menampilkan detail spesifikasi lot, jaminan keaslian, Base64 utuh, dan chip tombol bid.</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/auctions/:id/bids</code></td>
-<td><code>BIDDER</code></td>
-<td>Mengirim penawaran tombol diskrit; validasi instan buyout &amp; anti-sniping.</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
-<td><code>BIDDER</code></td>
-<td>Mengonfigurasi batas limit penawar otomatis (<em>proxy bot</em>).</td>
-</tr>
-<tr>
-<td><code>DELETE</code></td>
-<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
-<td><code>BIDDER</code></td>
-<td>Membatalkan / menonaktifkan konfigurasi bot penawar otomatis.</td>
-</tr>
-<tr>
-<td><code>POST</code></td>
-<td><code>/api/v1/admin/auctions</code></td>
-<td><code>ADMIN</code></td>
-<td>Membuat listing lot baru (<code>multipart/form-data</code>, file binary disimpan ke DB <code>BYTEA</code>).</td>
-</tr>
-</tbody>
-</table>
+<tr><td>`GET`</td><td>`/api/v1/auth/niro/authorize-url`</td><td>Public</td><td>Mendapatkan URL redirect SSO NIRO beserta state parameter CSRF.</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/auth/login/niro`</td><td>Public</td><td>Tukar token NIRO; auto-register jika baru (role `BIDDER`) atau buat sesi JWT jika sudah ada.</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/auth/login/email`</td><td>Public</td><td>Login email & password (min. 12 char) khusus `SUPERADMIN` dengan progressive lockout.</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/admin/users`</td><td>`SUPERADMIN`</td><td>Mengambil daftar user terdaftar NIRO (lengkap dengan pagination meta).</td></tr>
+<tr><td>`PATCH`</td><td>`/api/v1/admin/users/:id/role`</td><td>`SUPERADMIN`</td><td>Mengubah role user ke `ADMIN` dan otomatis memicu *session revocation* (auto-logout).</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/wallet/me`</td><td>`BIDDER`</td><td>Mengambil saldo bebas likuid (`available_balance`) dan agunan (`locked_balance`).</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/wallet/topup`</td><td>`BIDDER`</td><td>Menambah saldo deposit e-wallet penawar (minimal Rp 100.000).</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/wallet/transactions`</td><td>`BIDDER`</td><td>Mengambil riwayat mutasi jurnal keuangan penawar berhalaman (*pagination*).</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/auctions/active`</td><td>Public</td><td>Menampilkan katalog lelang aktif (gambar thumbnail Base64 & pagination meta).</td></tr>
+<tr><td>`GET`</td><td>`/api/v1/auctions/:id`</td><td>Public</td><td>Menampilkan detail spesifikasi lot, jaminan keaslian, Base64 utuh, dan chip tombol bid.</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/auctions/:id/bids`</td><td>`BIDDER`</td><td>Mengirim penawaran tombol diskrit; validasi instan buyout & anti-sniping.</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/auctions/:id/proxy-bid`</td><td>`BIDDER`</td><td>Mengonfigurasi batas limit penawar otomatis (*proxy bot*).</td></tr>
+<tr><td>`DELETE`</td><td>`/api/v1/auctions/:id/proxy-bid`</td><td>`BIDDER`</td><td>Membatalkan / menonaktifkan konfigurasi bot penawar otomatis.</td></tr>
+<tr><td>`POST`</td><td>`/api/v1/admin/auctions`</td><td>`ADMIN`</td><td>Membuat listing lot baru (`multipart/form-data`, file binary disimpan ke DB `BYTEA`).</td></tr>
+</tbody></table>
 <h3>6.3 Real-Time Streaming Specification (Server-Sent Events)</h3>
-<ul>
-<li><strong>Koneksi Room Lot:</strong> <code>GET /api/v1/sse/auctions/:id</code></li>
-<li><strong>Koneksi Ticker Global:</strong> <code>GET /api/v1/sse/catalog</code></li>
-<li><strong>Format Event Stream:</strong>
-<ul>
-<li><code>event: PRICE_UPDATED</code> $\rightarrow$ Mutasi harga penawaran terkini dan ID penawar tertinggi.</li>
-<li><code>event: TIME_EXTENDED</code> $\rightarrow$ Pemberitahuan perpanjangan waktu anti-sniping.</li>
-<li><code>event: AUCTION_BUYOUT_CLOSED</code> $\rightarrow$ Pemberitahuan lelang ditutup karena buyout.</li>
-<li><code>event: AUCTION_CONCLUDED</code> $\rightarrow$ Pemberitahuan lelang selesai dan settlement dieksekusi.</li>
-</ul>
-</li>
-</ul>
+<ul><li>**Koneksi Room Lot:** `GET /api/v1/sse/auctions/:id`</li></ul>
+<ul><li>**Koneksi Ticker Global:** `GET /api/v1/sse/catalog`</li></ul>
+<ul><li>**Format Event Stream:**</li></ul>
+<p>  - `event: PRICE_UPDATED` $\rightarrow$ Mutasi harga penawaran terkini dan ID penawar tertinggi.</p>
+<p>  - `event: TIME_EXTENDED` $\rightarrow$ Pemberitahuan perpanjangan waktu anti-sniping.</p>
+<p>  - `event: AUCTION_BUYOUT_CLOSED` $\rightarrow$ Pemberitahuan lelang ditutup karena buyout.</p>
+<p>  - `event: AUCTION_CONCLUDED` $\rightarrow$ Pemberitahuan lelang selesai dan settlement dieksekusi.</p>
 <hr>
 <h2>7. Non-Functional Requirement</h2>
-<h3>7.1 Performance &amp; Concurrency (SLA)</h3>
-<ul>
-<li><strong>Target Latensi Hot-Path:</strong> Pemrosesan penawaran di lapisan memori Redis Lua wajib selesai dalam waktu $&lt; 5\text{ ms}$.</li>
-<li><strong>Latensi Siaran Real-Time:</strong> Sinkronisasi pembaruan harga ke seluruh browser penawar via SSE wajib $&lt; 300\text{ ms}$.</li>
-<li><strong>Kapasitas Konkurensi:</strong> Sistem mampu melayani lonjakan beban hingga <strong>10.000 transaksi/detik</strong> tanpa terjadi <em>race condition</em> atau data ganda.</li>
-</ul>
-<h3>7.2 Availability &amp; Resilience</h3>
-<ul>
-<li><strong>Dual-Site Failover:</strong> Arsitektur Kubernetes dan PostgreSQL mendukung topologi multi-node dengan replikasi data sinkron.</li>
-<li><strong>Auto-Reconnect SSE:</strong> Klien frontend otomatis mencoba menyambung kembali (<em>reconnect</em>) secara berkala jika jaringan terputus tanpa menghilangkan status lelang di memori klien.</li>
-<li><strong>Distributed Lock:</strong> Penguncian berbasis Redis Mutex (<code>lock:settle:{lot_id}</code>) menjamin proses <em>settlement</em> lelang hanya dieksekusi tepat satu kali oleh satu <em>daemon instance</em>.</li>
-</ul>
-<h3>7.3 Security &amp; Access Control</h3>
-<ul>
-<li><strong>Proteksi Brute-Force Superadmin:</strong> Progressive lockout memitigasi serangan kamus (<em>dictionary attack</em>) dengan pembatasan waktu bertingkat (1m $\rightarrow$ 2m $\rightarrow$ 1h).</li>
-<li><strong>Strict Role Segregation:</strong> Endpoint top-up saldo dan penawaran lelang secara ketat diisolasi hanya untuk peran <code>BIDDER</code>. AM dan Superadmin dilarang keras menawar lot lelang untuk mencegah benturan kepentingan (<em>conflict of interest</em>).</li>
-<li><strong>Token Invalidation:</strong> Perubahan hak akses pengguna memicu pembatalan token seketika (<em>token revocation</em>) melalui penambahan <code>token_version</code> di memori Redis.</li>
-</ul>
-<h3>7.4 Data Integrity &amp; Audit Trail</h3>
-<ul>
-<li><strong>ACID Financial Ledger:</strong> Semua mutasi saldo penawar (Top-up, Lock, Debit Pemenang, Release Agunan) dicatat dalam tabel <code>ledger_entries</code> dengan prinsip jurnal berpasangan (<em>double-entry bookkeeping</em>) yang tidak dapat diubah (<em>immutable</em>).</li>
-<li><strong>Audit Trail Penawaran:</strong> Setiap histori penawaran yang sah maupun gagal tersimpan lengkap dengan <em>timestamp</em> presisi milidetik pada PostgreSQL.</li>
-</ul>
+<h3>7.1 Performance & Concurrency (SLA)</h3>
+<ul><li>**Target Latensi Hot-Path:** Pemrosesan penawaran di lapisan memori Redis Lua wajib selesai dalam waktu $< 5\text{ ms}$.</li></ul>
+<ul><li>**Latensi Siaran Real-Time:** Sinkronisasi pembaruan harga ke seluruh browser penawar via SSE wajib $< 300\text{ ms}$.</li></ul>
+<ul><li>**Kapasitas Konkurensi:** Sistem mampu melayani lonjakan beban hingga **10.000 transaksi/detik** tanpa terjadi *race condition* atau data ganda.</li></ul>
+<h3>7.2 Availability & Resilience</h3>
+<ul><li>**Dual-Site Failover:** Arsitektur Kubernetes dan PostgreSQL mendukung topologi multi-node dengan replikasi data sinkron.</li></ul>
+<ul><li>**Auto-Reconnect SSE:** Klien frontend otomatis mencoba menyambung kembali (*reconnect*) secara berkala jika jaringan terputus tanpa menghilangkan status lelang di memori klien.</li></ul>
+<ul><li>**Distributed Lock:** Penguncian berbasis Redis Mutex (`lock:settle:{lot_id}`) menjamin proses *settlement* lelang hanya dieksekusi tepat satu kali oleh satu *daemon instance*.</li></ul>
+<h3>7.3 Security & Access Control</h3>
+<ul><li>**Proteksi Brute-Force Superadmin:** Progressive lockout memitigasi serangan kamus (*dictionary attack*) dengan pembatasan waktu bertingkat (1m $\rightarrow$ 2m $\rightarrow$ 1h).</li></ul>
+<ul><li>**Strict Role Segregation:** Endpoint top-up saldo dan penawaran lelang secara ketat diisolasi hanya untuk peran `BIDDER`. AM dan Superadmin dilarang keras menawar lot lelang untuk mencegah benturan kepentingan (*conflict of interest*).</li></ul>
+<ul><li>**Token Invalidation:** Perubahan hak akses pengguna memicu pembatalan token seketika (*token revocation*) melalui penambahan `token_version` di memori Redis.</li></ul>
+<h3>7.4 Data Integrity & Audit Trail</h3>
+<ul><li>**ACID Financial Ledger:** Semua mutasi saldo penawar (Top-up, Lock, Debit Pemenang, Release Agunan) dicatat dalam tabel `ledger_entries` dengan prinsip jurnal berpasangan (*double-entry bookkeeping*) yang tidak dapat diubah (*immutable*).</li></ul>
+<ul><li>**Audit Trail Penawaran:** Setiap histori penawaran yang sah maupun gagal tersimpan lengkap dengan *timestamp* presisi milidetik pada PostgreSQL.</li></ul>
 <hr>
 <h2>8. Sign-Off</h2>
-<p>Dokumen spesifikasi kebutuhan perangkat lunak (<em>Software Requirement Specification</em>) ini telah ditinjau secara menyeluruh, diselaraskan dengan kebutuhan kompetisi Hackathon 2026 dan pedoman teknis internal PT Ako Media Asia (SALT), serta secara resmi disahkan sebagai acuan tunggal pengembangan sistem.</p>
+<p>Dokumen spesifikasi kebutuhan perangkat lunak (<em>Software Requirement Specification</em>) v2.0 ini telah ditinjau secara menyeluruh, diselaraskan dengan kebutuhan kompetisi Hackathon 2026 dan pedoman teknis internal PT Ako Media Asia (SALT), serta secara resmi disahkan sebagai acuan tunggal pengembangan sistem.</p>
+
 
 <div class="sign-off-wrapper">
   <table class="sign-off-table">
@@ -901,36 +605,39 @@
     </thead>
     <tbody>
       <tr>
+        <!-- 1. Geri Setyo Andrian (SIGNED) -->
         <td>
           <div class="sign-cell">
-            <div class="sign-box-empty">
-              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            <div class="sign-box-sig">
+              <img src="data:image/png;base64,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" alt="Tanda Tangan Geri" class="sign-image"/>
             </div>
             <div class="sign-meta-footer">
-              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
-              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+              <div class="sign-meta-row"><strong>Tanggal:</strong> 24 / 10 / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &#10003; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
             </div>
           </div>
         </td>
+        <!-- 2. Alini (SIGNED) -->
         <td>
           <div class="sign-cell">
-            <div class="sign-box-empty">
-              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            <div class="sign-box-sig">
+              <img src="data:image/png;base64,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" alt="Tanda Tangan Alini" class="sign-image"/>
             </div>
             <div class="sign-meta-footer">
-              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
-              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+              <div class="sign-meta-row"><strong>Tanggal:</strong> 24 / 10 / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &#10003; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
             </div>
           </div>
         </td>
+        <!-- 3. Aprilia Dwi Lestari (SIGNED) -->
         <td>
           <div class="sign-cell">
-            <div class="sign-box-empty">
-              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            <div class="sign-box-sig">
+              <img src="data:image/png;base64,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" alt="Tanda Tangan Aprilia Dwi Lestari" class="sign-image" />
             </div>
             <div class="sign-meta-footer">
-              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
-              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+              <div class="sign-meta-row"><strong>Tanggal:</strong> 24 / 10 / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &#10003; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
             </div>
           </div>
         </td>
@@ -938,6 +645,8 @@
     </tbody>
   </table>
 </div>
+
+
 
 
 </body>

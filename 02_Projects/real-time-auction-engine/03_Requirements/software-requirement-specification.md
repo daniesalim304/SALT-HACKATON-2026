@@ -140,18 +140,49 @@ flowchart TD
 
 ### 3.2 Use Case Specifications & Actor Matrix
 
-| Use Case ID | Nama Use Case | Aktor Utama | Deskripsi Singkat | Pre-kondisi |
-|---|---|---|---|---|
-| **UC-AUTH-01** | Login NIRO SSO | Bidder, AM | Masuk via OAuth2 NIRO. Jika pengguna baru, sistem mendaftarkan role `BIDDER` secara otomatis. | Pengguna memiliki akun NIRO aktif. |
-| **UC-AUTH-02** | Login Superadmin | Superadmin | Masuk via email & password internal (min 12 char) dengan progressive lockout. | Kredensial superadmin terdaftar. |
-| **UC-AUTH-03** | Promosi Role User | Superadmin | Mengubah role user NIRO menjadi `ADMIN` dan otomatis logout sesi aktif user. | Superadmin login; Target user terdaftar. |
-| **UC-WAL-01** | Top-Up E-Wallet | Bidder | Menambah saldo likuid penawar dengan nominal minimal Rp 100.000. | Pengguna berstatus role `BIDDER`. |
-| **UC-BID-01** | Penawaran Inkremental | Bidder | Menawar lot barang mewah menggunakan tombol bertingkat diskrit (tanpa teks bebas). | Saldo bebas cukup; Lot berstatus `ACTIVE`. |
-| **UC-BID-02** | Aktivasi Proxy Bid | Bidder | Menyetel batas penawaran otomatis agar sistem menawar balik saat tersalip. | Saldo bebas $\ge$ limit batas proxy. |
-| **UC-BID-03** | Beli Langsung (Buyout)| Bidder | Membeli instan lot lelang model Capped pada harga batas valuasi ceiling. | Saldo bebas $\ge$ harga valuation ceiling. |
-| **UC-LOT-01** | Listing Lot Baru | AM | Mengunggah foto biner, menentukan kelipatan tombol bid, harga dasar, dan extend window. | User berstatus role `ADMIN`. |
-| **UC-SET-01** | Otomasi Settlement | System Daemon| Memotong saldo pemenang, melepas agunan peserta kalah 100%, dan menerbitkan hak milik aset. | Durasi lelang habis atau buyout tercapai. |
-| **UC-STR-01** | Streaming Live Harga | Universal | Menerima pembaruan harga lelang dan timer via Server-Sent Events (SSE). | Terkoneksi ke internet. |
+| Use Case ID | User Story Ref | Nama Fitur / Modul | Aktor Utama | Total AC | Story Size | Deskripsi Fungsional & Prekondisi |
+|---|---|---|---|:---:|:---:|---|
+| **UC-AUTH-01** | **US-AUTH** | Dual Authentication & Progressive Lockout | Bidder, AM, Superadmin | 8 | **M (155)** | Login NIRO SSO untuk Bidder/AM; Email/Pass min. 12 char + progressive lockout (1m/2m/1h) untuk Superadmin; Promosi role trigger auto-logout. |
+| **UC-WAL-01** | **US-001** | E-Wallet Top-Up Journey (Step 1-3) | Bidder Exclusive | 9 | **M (115)** | Validasi min. Rp 100.000, kelipatan rupiah utuh, pemilihan channel VA/E-wallet, timer sesi kedaluwarsa, dan isolasi akses non-Bidder. |
+| **UC-BID-01** | **US-002** | Dynamic Collateral Hold During Bidding | Bidder Exclusive | 4 | **M (175)** | Validasi ketersediaan saldo likuid; saldo dipindahkan ke locked balance saat menawar dan TETAP TERTAHAN selama lelang berlangsung. |
+| **UC-BID-02** | **US-003** | Incremental Discrete Bidding & Modal Confirm | Bidder Exclusive | 8 | **M (170)** | Penawaran menggunakan tombol bertingkat (+Rp 5m/+Rp 10m) tanpa free-text typing, pop-up konfirmasi, dan serialisasi Redis Lua < 5 ms. |
+| **UC-BID-03** | **US-004** | Velocity-Based Anti-Sniping Extension | Bidder, AM | 3 | **M (115)** | Deteksi intensitas lonjakan penawaran ($\ge$ 10 hits/s) pada jendela 2 menit akhir untuk memicu perpanjangan waktu dinamis otomatis. |
+| **UC-BID-04** | **US-005** | Instant Buy-Out on Capped Valuation | Bidder Exclusive | 3 | **M (115)** | Penyelesaian lelang seketika jika penawar menekan tombol Instant Buy-Out atau mencapai ceiling valuation pada model lelang Capped. |
+| **UC-BID-05** | **US-006** | Autonomous Proxy Bidding Worker | Bidder Exclusive | 4 | **M (130)** | Bot penawar otomatis yang mengevaluasi outbid event via Redis stream dan melakukan counter-bid hingga batas limit maksimal. |
+| **UC-LOT-01** | **US-007** | Auction Lot Creation, Rule Form & BLOB | AM Exclusive | 11 | **M (115)** | Formulir kurasi lot lelang: input identitas, upload foto biner ke PostgreSQL BYTEA, live preview, pricing rules, dan anti-sniping selector. |
+| **UC-STR-01** | **US-008** | Universal Live Bid & Concurrency Stream | Universal | 6 | **M (140)** | Sinkronisasi mutasi harga, countdown timer, dan indikator status via Server-Sent Events (SSE) dengan latensi $< 300\text{ ms}$. |
+| **UC-SET-01** | **US-009** | Automated Settlement & Reconciliation Queue | AM, Daemon | 6 | **M (200)** | Background daemon 1s mengeksekusi settlement ACID: debet pemenang, rilis agunan peserta kalah 100%, serta resolusi exception short-payment. |
+| **UC-CAT-01** | **US-010** | Marketplace Catalog & Filtering | Universal | 12 | **M (165)** | Galeri katalog barang bernilai tinggi: kategori, pagination, thumbnail Base64, dan filter dinamis sesuai status lelang. |
+| **UC-HST-01** | **US-011** | Participant Bid History & Settlement Detail | Bidder Exclusive | 10 | **M (140)** | Dashboard riwayat penawaran: active bids, leading, outbid, won, progress tracker lelang tertutup, dan invoice settlement drawer. |
+| **UC-DTL-01** | **US-012** | Product Detail Page & Live Room SSE | Universal | 9 | **M (110)** | Halaman detail lot: Base64 image, authenticity guarantee, chart riwayat harga lelang, tabs menu, dan banner proteksi koneksi terputus. |
+| **UC-OVR-01** | **US-013** | Operations & Market Overview Dashboard | Universal | 6 | **S (90)** | Ringkasan metrik makro: Live sync indicator pill, 4 kartu saldo & status bid, watchlist slider ending soon, dan timeline recent activity. |
+| **UC-LTM-01** | **US-014** | Lot Management Catalog Lifecycle Matrix | AM Exclusive | 8 | **S (65)** | Manajemen siklus hidup lot: 5 lifecycle tabs (Draft, Scheduled, Active, Closed, Archived), aksi View/Edit/Archive, dan toast notifikasi. |
+| **UC-MON-01** | **US-015** | Live Auction Monitor & Authorized Interventions | AM Exclusive | 7 | **M (140)** | Pemantauan operasional mendalam: incoming bid acceleration, unique bidders, p95 latency gateway, serta intervensi (Pause, Flag, Cancel). |
+| **UC-DIR-01** | **US-016** | Participants Directory & Compliance KYC | AM Exclusive | 6 | **M (140)** | Direktori peserta lelang: 4 metrik verifikasi, saldo agunan aktif, export data CSV/XLSX, dan kontrol verifikasi KYC. |
+
+
+### 3.2.1 Story Sizing Appraisal & Complexity Matrix
+Berikut adalah ringkasan hasil kalkulasi bobot estimasi (*Story Sizing Appraisal*) untuk seluruh 17 modul User Story berdasarkan formula parameter standar (*New Technology*, *# Surrounding Involvement*, *Technical Flow Sequences*, *Acceptance Criteria Count*, dan *UI Slicing Complexity*):
+
+| Story ID | User Story Title | New Tech (15%) | Surrounding (15%) | Tech Flow (30%) | AC Count (25%) | UI Slicing (15%) | Total Score | Final Size | Story Point (APPS) |
+|:---|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **US-AUTH** | Multi-Role Auth & Progressive Lockout | 15 (1) | 30 (2) | 60 (2) | 50 (2) | 0 (0) | **155** | **M** | 2.5 |
+| **US-001** | E-Wallet Top-Up Journey (Step 1-3) | 15 (1) | 15 (1) | 60 (2) | 25 (1) | 0 (0) | **115** | **M** | 2.5 |
+| **US-002** | Dynamic Collateral Hold During Bidding | 45 (3) | 15 (1) | 90 (3) | 25 (1) | 0 (0) | **175** | **M** | 2.5 |
+| **US-003** | Incremental Bid on Uncapped Auction | 15 (1) | 15 (1) | 90 (3) | 50 (2) | 0 (0) | **170** | **M** | 2.5 |
+| **US-004** | Velocity-Based Anti-Sniping Extension | 15 (1) | 15 (1) | 60 (2) | 25 (1) | 0 (0) | **115** | **M** | 2.5 |
+| **US-005** | Instant Buy-Out on Capped Valuation | 15 (1) | 15 (1) | 60 (2) | 25 (1) | 0 (0) | **115** | **M** | 2.5 |
+| **US-006** | Automated Proxy Bidding Bot | 0 (0) | 15 (1) | 90 (3) | 25 (1) | 0 (0) | **130** | **M** | 2.5 |
+| **US-007** | Lot Creation, Rules & Form Layout | 15 (1) | 15 (1) | 60 (2) | 25 (1) | 0 (0) | **115** | **M** | 2.5 |
+| **US-008** | Universal Live Bid & Concurrency Stream | 15 (1) | 15 (1) | 60 (2) | 50 (2) | 0 (0) | **140** | **M** | 2.5 |
+| **US-009** | Settlement & Collateral Reconciliation | 15 (1) | 15 (1) | 120 (4) | 50 (2) | 0 (0) | **200** | **M** | 2.5 |
+| **US-010** | View Item Marketplace & Catalog | 15 (1) | 15 (1) | 60 (2) | 75 (3) | 0 (0) | **165** | **M** | 2.5 |
+| **US-011** | Participant Bid History & Settlement | 15 (1) | 15 (1) | 60 (2) | 50 (2) | 0 (0) | **140** | **M** | 2.5 |
+| **US-012** | Product Detail & Live Room SSE | 15 (1) | 15 (1) | 30 (1) | 50 (2) | 0 (0) | **110** | **M** | 2.5 |
+| **US-013** | Operations & Market Overview | 0 (0) | 15 (1) | 0 (0) | 75 (3) | 0 (0) | **90** | **S** | 2.5 |
+| **US-014** | Lot Management Catalog Lifecycle | 0 (0) | 15 (1) | 0 (0) | 50 (2) | 0 (0) | **65** | **S** | 2.5 |
+| **US-015** | Live Auction Monitor & Interventions | 15 (1) | 15 (1) | 60 (2) | 50 (2) | 0 (0) | **140** | **M** | 2.5 |
+| **US-016** | Participants Directory & Compliance | 15 (1) | 15 (1) | 60 (2) | 50 (2) | 0 (0) | **140** | **M** | 2.5 |
 
 ### 3.3 Detailed User Flow (Core Scenarios)
 1. **Alur Login & Auto-Provisioning NIRO:**
