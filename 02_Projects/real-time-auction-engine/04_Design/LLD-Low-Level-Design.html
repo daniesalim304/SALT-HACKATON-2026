@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-size: 13.5pt;
+    font-weight: 600;
+    color: #1e3a8a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1e40af;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  ul, ol {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 8.5pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 8pt;
+    line-height: 1.4;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+  blockquote {
+    border-left: 4px solid #3b82f6;
+    margin: 12px 0;
+    padding: 8px 12px;
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-size: 9.5pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background-color: #fcfcfd;
+  }
+  hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 20px 0;
+  }
+  .mermaid-wrapper {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 14px 0;
+    page-break-inside: avoid;
+  }
+  .mermaid {
+    text-align: center;
+  }
+
+  /* Formal Sign-off Table */
+  .sign-off-wrapper {
+    margin-top: 25px;
+    page-break-inside: avoid;
+  }
+  table.sign-off-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #334155;
+    margin-top: 10px;
+  }
+  table.sign-off-table th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 9pt;
+    text-align: center;
+    border: 1.5px solid #334155;
+    padding: 8px;
+    width: 33.33%;
+  }
+  table.sign-off-table td {
+    border: 1.5px solid #334155;
+    padding: 0;
+    vertical-align: top;
+  }
+  .sign-cell {
+    display: flex;
+    flex-direction: column;
+    height: 190px;
+    box-sizing: border-box;
+  }
+  .sign-role-title {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #475569;
+    font-weight: 600;
+  }
+  .sign-person-name {
+    font-size: 10pt;
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .sign-box-empty {
+    flex: 1;
+    border: 1px dashed #cbd5e1;
+    margin: 8px 12px;
+    border-radius: 4px;
+    background-color: #fcfcfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sign-box-placeholder {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    font-style: italic;
+  }
+  .sign-meta-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 12px 8px 12px;
+    font-size: 7.5pt;
+    color: #334155;
+    background-color: #ffffff;
+  }
+  .sign-meta-row {
+    margin-bottom: 3px;
+  }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' }
+    });
+  </script>
+</head>
+<body>
+  <p>﻿# Low-Level Design (LLD) â€” Real-Time Luxury Auction Engine</p>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Nilai</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dokumen</strong></td>
+<td>Low-Level Design (LLD) &amp; Component Specifications</td>
+</tr>
+<tr>
+<td><strong>Proyek</strong></td>
+<td>Real-Time Auction &amp; Bidding Engine (Fintech / E-Commerce)</td>
+</tr>
+<tr>
+<td><strong>Versi</strong></td>
+<td>v1.0.0</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td><code>Approved Baseline</code></td>
+</tr>
+<tr>
+<td><strong>Tanggal</strong></td>
+<td>2026-10-24</td>
+</tr>
+<tr>
+<td><strong>Target Komponen</strong></td>
+<td>Golang Domain, Usecase, Redis Lua Engine, dan WebSocket Hub</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. Spesifikasi Model Domain (Golang Structs)</h2>
+<p>Lapisan domain tidak memiliki dependensi eksternal (<em>pure business entities</em>):</p>
+<pre><code class="language-go">package domain
+
+import (
+	&quot;time&quot;
+	&quot;github.com/google/uuid&quot;
+)
+
+type UserRole string
+const (
+	RoleBidder     UserRole = &quot;BIDDER&quot;
+	RoleAdmin      UserRole = &quot;ADMIN&quot;
+	RoleSuperAdmin UserRole = &quot;SUPERADMIN&quot;
+)
+
+type AuthProvider string
+const (
+	ProviderNiro     AuthProvider = &quot;NIRO&quot;
+	ProviderInternal AuthProvider = &quot;INTERNAL&quot;
+)
+
+type User struct {
+	ID           uuid.UUID    `json:&quot;id&quot;`
+	AuthProvider AuthProvider `json:&quot;auth_provider&quot;`
+	NiroUserID   *string      `json:&quot;niro_user_id,omitempty&quot;`
+	Username     string       `json:&quot;username&quot;`
+	Email        string       `json:&quot;email&quot;`
+	PasswordHash *string      `json:&quot;-&quot;`
+	Role         UserRole     `json:&quot;role&quot;`
+	CreatedAt    time.Time    `json:&quot;created_at&quot;`
+	UpdatedAt    time.Time    `json:&quot;updated_at&quot;`
+}
+
+type Wallet struct {
+	ID               uuid.UUID `json:&quot;id&quot;`
+	UserID           uuid.UUID `json:&quot;user_id&quot;`
+	AvailableBalance float64   `json:&quot;available_balance&quot;`
+	LockedBalance    float64   `json:&quot;locked_balance&quot;`
+	Version          int64     `json:&quot;version&quot;`
+	UpdatedAt        time.Time `json:&quot;updated_at&quot;`
+}
+
+type AuctionModel string
+const (
+	ModelUncapped AuctionModel = &quot;UNCAPPED&quot;
+	ModelCapped   AuctionModel = &quot;CAPPED&quot;
+)
+
+type AuctionStatus string
+const (
+	StatusDraft         AuctionStatus = &quot;DRAFT&quot;
+	StatusActive        AuctionStatus = &quot;ACTIVE&quot;
+	StatusClosedAwarded AuctionStatus = &quot;CLOSED_AWARDED&quot;
+	StatusSettled       AuctionStatus = &quot;SETTLED&quot;
+	StatusExpiredUnsold AuctionStatus = &quot;EXPIRED_UNSOLD&quot;
+)
+
+type AssetCategory string
+const (
+	CatWatches     AssetCategory = &quot;LUXURY_WATCHES&quot;
+	CatBags        AssetCategory = &quot;DESIGNER_BAGS&quot;
+	CatJewelry     AssetCategory = &quot;FINE_JEWELRY&quot;
+	CatVehicles    AssetCategory = &quot;COLLECTIBLE_VEHICLES&quot;
+	CatMemorabilia AssetCategory = &quot;RARE_MEMORABILIA&quot;
+)
+
+type Auction struct {
+	ID                     uuid.UUID     `json:&quot;id&quot;`
+	Title                  string        `json:&quot;title&quot;`
+	Category               AssetCategory `json:&quot;category&quot;`
+	ConditionGrade         string        `json:&quot;condition_grade&quot;`
+	AuthenticityGuarantee  string        `json:&quot;authenticity_guarantee&quot;`
+	Description            string        `json:&quot;description&quot;`
+	ImageData              []byte        `json:&quot;-&quot;` // Binary BLOB di DB
+	ImageBase64Compressed  string        `json:&quot;image_base64_compressed&quot;` // Hasil decode Base64 Compressed saat di-return
+	ModelType              AuctionModel  `json:&quot;model_type&quot;`
+	Status                 AuctionStatus `json:&quot;status&quot;`
+	StartingPrice          float64       `json:&quot;starting_price&quot;`
+	CurrentPrice           float64       `json:&quot;current_price&quot;`
+	MinIncrement           float64       `json:&quot;min_increment&quot;`
+	AllowedIncrementSteps  []float64     `json:&quot;allowed_increment_steps&quot;`
+	ValuationCeiling       *float64      `json:&quot;valuation_ceiling,omitempty&quot;`
+	AntiSnipingExtensionMin *int         `json:&quot;anti_sniping_extension_minutes,omitempty&quot;`
+	StartTime              time.Time     `json:&quot;start_time&quot;`
+	EndTime                time.Time     `json:&quot;end_time&quot;`
+	OriginalEndTime        time.Time     `json:&quot;original_end_time&quot;`
+	HighestBidderID        *uuid.UUID    `json:&quot;highest_bidder_id,omitempty&quot;`
+	CreatedBy              uuid.UUID     `json:&quot;created_by&quot;`
+	CreatedAt              time.Time     `json:&quot;created_at&quot;`
+	UpdatedAt              time.Time     `json:&quot;updated_at&quot;`
+}
+</code></pre>
+<hr>
+<h2>2. Rincian Logika Usecase (Application Layer)</h2>
+<h3>2.1 BidUsecase: PlaceBid (Orkestrasi Penawaran Inkremental)</h3>
+<p>Algoritma pemrosesan penawaran:</p>
+<ol>
+<li><strong>Validasi Awal Payload:</strong> Pastikan nominal kenaikan (<em>increment</em>) sesuai dengan salah satu angka pada array <code>allowed_increment_steps</code> milik lot, atau request merupakan aksi <em>Buyout Langsung</em>.</li>
+<li><strong>Pengecekan Saldo di Redis:</strong> Periksa hash <code>wallet:{user_id}</code>. Pastikan <code>available_balance &gt;= target_bid</code>.</li>
+<li><strong>Eksekusi Atomik Lua Script (<code>bid_placement.lua</code>):</strong>
+<ul>
+<li>Menguji apakah status lot masih <code>ACTIVE</code> dan <code>now &lt; end_time</code>.</li>
+<li>Mengurangi <code>available_balance</code> penawar baru dan memindahkannya ke <code>locked_balance</code> (saldo tertahan).</li>
+<li><em>(Pemberitahuan Penting: Saldo penawar sebelumnya TIDAK dilepaskan saat tersalip, melainkan tetap terkunci/tertahan sampai periode lelang selesai).</em></li>
+<li>Memeriksa apakah <code>now &gt;= end_time - 15s</code> (Anti-Sniping). Jika ya, menambahkan <code>end_time = end_time + 30s</code> (dengan proteksi batas maksimal).</li>
+<li>Memeriksa apakah <code>target_bid &gt;= valuation_ceiling</code> (Capped Model). Jika ya, langsung ubah status lot menjadi <code>CLOSED_AWARDED</code>.</li>
+</ul>
+</li>
+<li><strong>Penerbitan Event Real-Time:</strong> Menulis pesan ke Redis Pub/Sub channel <code>channel:auction:events</code> untuk disiarkan oleh WebSocket Hub ke seluruh client dalam &lt; 300 ms.</li>
+<li><strong>Persistensi Asinkron:</strong> Menyimpan riwayat penawaran ke tabel PostgreSQL <code>bids</code>.</li>
+</ol>
+<h3>2.2 SettleUsecase: Automatic Expiry Settlement</h3>
+<p>Algoritma pekerja latar belakang (<em>settlement daemon</em>):</p>
+<ol>
+<li>Mengambil lot yang expired dari Redis Sorted Set: <code>ZRANGEBYSCORE auctions:expiry_zset -inf now()</code>.</li>
+<li>Mengambil <em>distributed lock</em> untuk lot tersebut: <code>SETNX lock:settle:{lot_id} &quot;locked&quot; EX 10</code>. Jika gagal mendapatkan lock, lewati (sudah ditangani instance lain).</li>
+<li>Mengecek data penawar tertinggi dari Redis <code>auction:{lot_id}</code>.</li>
+<li>Membuka transaksi database PostgreSQL:
+<ul>
+<li>Jika ada penawar tertinggi: Ubah status lelang menjadi <code>SETTLED</code>, potong permanen <code>locked_balance</code> pemenang, catat entri mutasi ledger <code>AUCTION_WIN_PAYMENT</code>, dan terbitkan baris di tabel <code>asset_ownership</code>.</li>
+<li>Jika tidak ada penawar: Ubah status lelang menjadi <code>EXPIRED_UNSOLD</code>.</li>
+<li>Pastikan seluruh agunan peserta lain berstatus 0 locked.</li>
+</ul>
+</li>
+<li>Menghapus key lelang aktif dari Redis dan memancarkan event <code>AUCTION_CONCLUDED</code> via WebSocket.</li>
+</ol>
+<hr>
+<h2>3. Desain Komponen WebSocket Hub</h2>
+<p>WebSocket Hub bertugas mempertahankan ribuan koneksi persisten peserta dan mendistribusikan pembaruan harga secara non-blocking:</p>
+<div class="mermaid-wrapper"><div class="mermaid">flowchart LR
+    subgraph Hub_Internals ["WebSocket Hub (Golang)"]
+        Register["Register Channel (Koneksi Baru)"]
+        Unregister["Unregister Channel (Koneksi Terputus)"]
+        Broadcast["Broadcast Channel (Event Inbound)"]
+        Rooms["Room Multiplexer (Map[lot_id][]ClientConn)"]
+    end
+
+    RedisSub["Redis Pub/Sub Subscriber"] -->|Event Masuk| Broadcast
+    Broadcast --> Rooms
+    Rooms -->|Push JSON Frame| Client1["Next.js Client 1"]
+    Rooms -->|Push JSON Frame| Client2["Next.js Client 2"]
+</div></div>
+<ul>
+<li><strong>Heartbeat &amp; Keep-Alive:</strong> Client mengirimkan frame ping setiap 30 detik. Jika server tidak menerima pong dalam 60 detik, koneksi ditutup secara bersih (<em>graceful cleanup</em>).</li>
+<li><strong>Multiplexing Room:</strong> Client mendaftarkan diri hanya pada lot yang sedang ditonton (<code>SUBSCRIBE_LOT</code>) untuk menghemat bandwidth, ditambah satu channel global untuk update etalase katalog.</li>
+</ul>
+<hr>
+<h2>4. Ikhtisar Endpoint List (Penjelasan Ringkas)</h2>
+<p>Berikut adalah penjelasan fungsional seluruh rute endpoint yang diimplementasikan pada lapisan Transport HTTP:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Hak Akses</th>
+<th>Penjelasan Fungsional</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/niro/authorize-url</code></td>
+<td>Publik</td>
+<td>Mendapatkan URL redirect otorisasi SSO NIRO beserta parameter state CSRF.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/niro</code></td>
+<td>Publik</td>
+<td>Verifikasi token NIRO; auto-register peserta jika user baru atau login jika sudah ada.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/email</code></td>
+<td>Publik</td>
+<td>Otentikasi khusus Superadmin platform dengan proteksi progressive lockout.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/users</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mengambil daftar pengguna login NIRO (mendukung pagination).</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/admin/users/:id/role</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mengubah hak akses pengguna NIRO menjadi <code>ADMIN</code> (Auction Manager).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/wallet/me</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengembalikan status saldo bebas (<em>Available</em>) dan saldo tertahan (<em>Locked</em>).</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/wallet/topup</code></td>
+<td><code>BIDDER</code></td>
+<td>Menambahkan saldo likuid bebas ke dompet (khusus Bidder, minimal Rp 100.000).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/active</code></td>
+<td>Publik</td>
+<td>Mengambil daftar lot barang bernilai tinggi aktif (Base64 image &amp; pagination).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/:id</code></td>
+<td>Publik</td>
+<td>Mengambil detail spesifikasi barang, jaminan keaslian, dan riwayat tawaran lot.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/bids</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengirim penawaran tombol inkremental; evaluasi buyout instan &amp; anti-sniping.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Menyetel bot penawaran otomatis dengan batas limit maksimal personal.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Membatalkan / menonaktifkan aturan bot proxy penawaran pada lot tertentu.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/auctions</code></td>
+<td><code>ADMIN</code></td>
+<td>Membuat listing lot lelang baru (multipart binary upload BLOB, setting jendela waktu &amp; extend).</td>
+</tr>
+<tr>
+<td><code>WS</code></td>
+<td><code>/api/v1/ws/auctions</code></td>
+<td>Universal</td>
+<td>Jalur koneksi real-time WebSocket yang dipantau oleh Bidder, AM, dan Superadmin.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>5. Lembar Pengesahan Dokumen (Document Sign-Off Section)</h2>
+<p>Dokumen perancangan tingkat rendah (<em>Low-Level Design</em>) ini telah ditinjau secara mendalam dari segi kelayakan teknis, struktur data, algoritma usecase, dan kesiapan pengujian TDD, serta secara resmi disahkan untuk tahap koding.</p>
+<table>
+<thead>
+<tr>
+<th>Peran &amp; Tanggung Jawab</th>
+<th>Nama Pejabat</th>
+<th style="text-align:center">Status Persetujuan</th>
+<th style="text-align:center">Tanggal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Project Manager</strong></td>
+<td><strong>Geri Setyo Andrian</strong></td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+<td style="text-align:center">2026-10-24</td>
+</tr>
+<tr>
+<td><strong>Tech Lead</strong></td>
+<td><strong>Alini</strong></td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+<td style="text-align:center">2026-10-24</td>
+</tr>
+<tr>
+<td><strong>System Analyst</strong></td>
+<td><strong>Daniel H. S.</strong></td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+<td style="text-align:center">2026-10-24</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

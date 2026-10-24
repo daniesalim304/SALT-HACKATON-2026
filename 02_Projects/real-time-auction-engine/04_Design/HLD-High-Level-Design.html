@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+  @page {
+    size: A4;
+    margin: 20mm 15mm 20mm 15mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+  h2 {
+    font-size: 13.5pt;
+    font-weight: 600;
+    color: #1e3a8a;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1e40af;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+  }
+  p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  ul, ol {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 4px;
+  }
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 8.5pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 8pt;
+    line-height: 1.4;
+    overflow-x: auto;
+    page-break-inside: avoid;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+  blockquote {
+    border-left: 4px solid #3b82f6;
+    margin: 12px 0;
+    padding: 8px 12px;
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-size: 9.5pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 8.5pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 600;
+  }
+  tr:nth-child(even) {
+    background-color: #fcfcfd;
+  }
+  hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 20px 0;
+  }
+  .mermaid-wrapper {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 14px 0;
+    page-break-inside: avoid;
+  }
+  .mermaid {
+    text-align: center;
+  }
+
+  /* Formal Sign-off Table */
+  .sign-off-wrapper {
+    margin-top: 25px;
+    page-break-inside: avoid;
+  }
+  table.sign-off-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #334155;
+    margin-top: 10px;
+  }
+  table.sign-off-table th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 9pt;
+    text-align: center;
+    border: 1.5px solid #334155;
+    padding: 8px;
+    width: 33.33%;
+  }
+  table.sign-off-table td {
+    border: 1.5px solid #334155;
+    padding: 0;
+    vertical-align: top;
+  }
+  .sign-cell {
+    display: flex;
+    flex-direction: column;
+    height: 190px;
+    box-sizing: border-box;
+  }
+  .sign-role-title {
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #475569;
+    font-weight: 600;
+  }
+  .sign-person-name {
+    font-size: 10pt;
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .sign-box-empty {
+    flex: 1;
+    border: 1px dashed #cbd5e1;
+    margin: 8px 12px;
+    border-radius: 4px;
+    background-color: #fcfcfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sign-box-placeholder {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    font-style: italic;
+  }
+  .sign-meta-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 12px 8px 12px;
+    font-size: 7.5pt;
+    color: #334155;
+    background-color: #ffffff;
+  }
+  .sign-meta-row {
+    margin-bottom: 3px;
+  }
+</style>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, curve: 'basis' }
+    });
+  </script>
+</head>
+<body>
+  <h1>High-Level Design (HLD) — Real-Time Luxury Auction Engine</h1>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Nilai</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Dokumen</strong></td>
+<td>High-Level Design (HLD) &amp; System Architecture</td>
+</tr>
+<tr>
+<td><strong>Proyek</strong></td>
+<td>Real-Time Auction &amp; Bidding Engine (Fintech / E-Commerce)</td>
+</tr>
+<tr>
+<td><strong>Versi</strong></td>
+<td>v1.1.0</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td><code>Approved Baseline</code></td>
+</tr>
+<tr>
+<td><strong>Tanggal</strong></td>
+<td>2026-10-24</td>
+</tr>
+<tr>
+<td><strong>Target SLA</strong></td>
+<td>Latensi Sinkronisasi &lt; 300 ms, Nol Race Condition, ACID Finansial</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. Topologi Arsitektur 4 Lapisan (4-Tier System Topology)</h2>
+<div class="mermaid-wrapper"><div class="mermaid">flowchart TD
+    subgraph Client_Tier ["1. Client Tier (Presentation)"]
+        UI_Bidder["Next.js Web App\n- Katalog Barang Mewah Reaktif\n- Tombol Bid Inkremental\n- Countdown Timer Sinkron Server"]
+        UI_Admin["Next.js Admin Console\n- Manajemen Lot & Jendela Waktu\n- Panel Promosi Superadmin\n- Live Monitoring Telemetri"]
+    end
+
+    subgraph Auth_Tier ["External Identity"]
+        NIRO["Sistem Autentikasi NIRO SSO\n(Identity Provider Peserta)"]
+    end
+
+    subgraph App_Tier ["2. Application Tier (Golang Clean Architecture)"]
+        Gateway["Reverse Proxy & Rate Limiter\n(Token Auth Middleware, CORS, TLS)"]
+        
+        subgraph Go_Core ["Golang Monolith / Modular Services"]
+            AuthSvc["Auth & RBAC Service\n- Validasi NIRO SSO\n- Bcrypt Internal Superadmin\n- Promosi Role User"]
+            BidEngine["Bid Placement Engine\n- Validasi Inkremental Tombol\n- Eksekusi Redis Lua Hot-Path\n- Evaluasi Capped Buyout"]
+            CatalogSvc["Catalog & Auction Service\n- Kurasi Barang Mewah\n- Pengaturan Jendela Waktu"]
+            ProxyWorker["Proxy Bidding Worker\n- Evaluasi Step Increment Otomatis\n- Resolusi Limit Peserta"]
+            SettleDaemon["Settlement Daemon\n- Deteksi Expiry via Redis ZSET\n- Distributed Lock & ACID Ledger"]
+            WSHub["WebSocket Broadcast Hub\n- Multiplexing Channel per Lot\n- Push Latensi Rendah < 300 ms"]
+        end
+    end
+
+    subgraph Memory_Tier ["3. In-Memory Hot-Path Tier (Redis 7)"]
+        LuaScripts["Redis Lua Scripts\n(Serialisasi Mutlak & Atomic Mutex)"]
+        RedisState["In-Memory State Store\n- auction:{id} HASH\n- wallet:{id} HASH\n- auctions:expiry_zset ZSET"]
+        RedisPubSub["Redis Pub/Sub Bus\n(Distribusi Event Antar-Goroutine)"]
+    end
+
+    subgraph DB_Tier ["4. Authoritative Persistence Tier (PostgreSQL 16)"]
+        PG[("PostgreSQL 16 Relational Ledger\n- users, roles, auth_provider\n- wallets & immutable ledger_entries\n- luxury auctions & proxy_bids\n- immutable bids history\n- asset_ownership & platform_configs")]
+    end
+
+    %% Relasi Client ke App
+    UI_Bidder -->|HTTPS REST| Gateway
+    UI_Bidder -->|WSS Stream| WSHub
+    UI_Admin -->|HTTPS REST| Gateway
+    UI_Bidder -.->|SSO Handshake| NIRO
+    NIRO -.->|Token Verification| AuthSvc
+
+    %% Internal App Routing
+    Gateway --> AuthSvc
+    Gateway --> BidEngine
+    Gateway --> CatalogSvc
+
+    %% Hot-Path Interaksi
+    BidEngine -->|EVALSHA (Atomic Bid & Hold)| LuaScripts
+    LuaScripts --> RedisState
+    LuaScripts -->|Publish Event| RedisPubSub
+    RedisPubSub -->|Subscribe| WSHub
+    WSHub -->|Push < 300ms| UI_Bidder
+    WSHub -->|Push < 300ms| UI_Admin
+
+    %% Persistensi & Daemon
+    BidEngine -.->|Async / Batch Insert| PG
+    CatalogSvc -->|CRUD Lot| PG
+    AuthSvc -->|User & Role Update| PG
+    ProxyWorker <-->|Poll & Trigger| RedisState
+    SettleDaemon -->|ZRANGEBYSCORE Expiry| RedisState
+    SettleDaemon -->|ACID Final Settlement| PG
+</div></div>
+<hr>
+<h2>2. Pola Arsitektur Backend (Golang Ports &amp; Adapters)</h2>
+<p>Untuk menjamin prinsip keterujian (<em>Test-Driven Development / TDD</em>) dan independensi logika bisnis, kode backend Golang dibagi menjadi 4 layer terpisah:</p>
+<pre><code class="language-text">backend/
+├── cmd/api/main.go           # Inisialisasi konfigurasi, koneksi DB, Redis, dan router
+├── internal/
+│   ├── domain/               # Entitas inti lelang, dompet, aturan inkremental, dan model lelang
+│   ├── usecase/              # Logika bisnis (Auth, Bidding, Catalog, Proxy, Settlement)
+│   ├── repository/           # Kontrak interface data dan implementasinya (Postgres &amp; Redis)
+│   └── transport/            # HTTP Handlers (Gin/Echo/Chi) &amp; WebSocket Event Broadcaster
+└── pkg/                      # Modul utilitas independen (JWT, Bcrypt, Logger, Rate Limiter)
+</code></pre>
+<hr>
+<h2>3. Justifikasi Keputusan Arsitektur Kritis (ADR Highlights)</h2>
+<table>
+<thead>
+<tr>
+<th>Keputusan Arsitektur</th>
+<th>Alternatif yang Dipertimbangkan</th>
+<th>Solusi Terpilih &amp; Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Penanganan Konkurensi Bidding</strong></td>
+<td>PostgreSQL Row Lock (<code>SELECT FOR UPDATE</code>)</td>
+<td><strong>Redis Lua Scripting.</strong> Menjalankan validasi saldo, penguncian harga, unfreeze saldo lama, dan anti-sniping dalam satu siklus memori (&lt; 5 ms), menjamin SLA &lt; 300 ms bebas <em>lock contention</em>.</td>
+</tr>
+<tr>
+<td><strong>Mekanisme Agunan Finansial</strong></td>
+<td>Saldo Mengendap Wajib Pasif</td>
+<td><strong>Dynamic Hold on Bid.</strong> Saldo pengguna 100% bebas sampai saat pengguna menekan tombol bid; dana tertahan persis sebesar nilai bid dan langsung cair jika tersalip (<em>instant unfreeze</em>).</td>
+</tr>
+<tr>
+<td><strong>Metode Penawaran Peserta</strong></td>
+<td>Input Bebas Form Angka</td>
+<td><strong>Discrete Increment Buttons.</strong> Menghilangkan risiko kesalahan ketik (<em>typo</em>) dan memastikan kenaikan harga teratur sesuai kelipatan yang ditentukan kurasi lot.</td>
+</tr>
+<tr>
+<td><strong>Model Siklus Lelang</strong></td>
+<td>Lelang Durasi Kaku / Tetap</td>
+<td><strong>Dual-Model (Capped vs Time Window).</strong> Fleksibilitas tinggi bagi penjual barang mewah: opsi beli langsung jika mencapai harga puncak, atau bersaing hingga akhir jendela waktu (misal 1 hari).</td>
+</tr>
+<tr>
+<td><strong>Arsitektur Autentikasi</strong></td>
+<td>Single Auth Provider</td>
+<td><strong>Dual-Login (NIRO SSO + Internal Superadmin).</strong> Mengintegrasikan SSO eksternal organisasi untuk peserta sekaligus mempertahankan kedaulatan kontrol administratif master platform.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>4. Lembar Pengesahan Dokumen (Document Sign-Off Section)</h2>
+<p>Dokumen arsitektur tingkat tinggi (<em>High-Level Design</em>) ini telah ditinjau secara komprehensif, diselaraskan dengan kebutuhan kompetisi Hackathon 2026, dan secara resmi disahkan sebagai acuan implementasi arsitektur platform.</p>
+
+<div class="sign-off-wrapper">
+  <table class="sign-off-table">
+    <thead>
+      <tr>
+        <th>
+          <div class="sign-role-title">Project Manager</div>
+          <div class="sign-person-name">Geri Setyo Andrian</div>
+        </th>
+        <th>
+          <div class="sign-role-title">Tech Lead</div>
+          <div class="sign-person-name">Alini</div>
+        </th>
+        <th>
+          <div class="sign-role-title">System Analyst</div>
+          <div class="sign-person-name">Daniel H. S.</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+</body>
+</html>

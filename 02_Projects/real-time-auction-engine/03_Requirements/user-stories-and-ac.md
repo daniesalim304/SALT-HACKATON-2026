@@ -108,8 +108,8 @@
       {
         "id": "AC-AUTH-008",
         "given": "A Super Admin is logged in to the Super Admin Portal",
-        "when": "The Super Admin selects an existing NIRO user and assigns the role 'ADMIN'",
-        "then": "The user's role is updated in the database, granting them immediate access to the Auction Manager Console on subsequent logins"
+        "when": "The Super Admin selects an existing NIRO user and assigns the role 'ADMIN' (Auction Manager)",
+        "then": "The user's role is updated in the database to 'ADMIN', and the user's active session/token is immediately revoked (auto-logged out). The user must log in again to receive an updated JWT token with the new role."
       }
     ]
   },

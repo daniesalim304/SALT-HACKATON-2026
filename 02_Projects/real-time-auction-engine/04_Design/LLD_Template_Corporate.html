@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>LOW LEVEL DESIGN DOCUMENT - Real-Time Luxury Auction Engine</title>
+  <style>
+  @page {
+    size: A4;
+    margin: 18mm 15mm 20mm 15mm;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 9.5pt;
+    line-height: 1.5;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Document Title & Cover Header */
+  .doc-header-banner {
+    border-bottom: 3px solid #e11d48;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .doc-title-main {
+    font-size: 22pt;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+  }
+  .doc-subtitle {
+    font-size: 13pt;
+    font-weight: 600;
+    color: #e11d48;
+    margin-top: 4px;
+    margin-bottom: 0;
+  }
+  .doc-category {
+    font-size: 10pt;
+    color: #64748b;
+    margin-top: 2px;
+  }
+
+  h1 { display: none; } /* Replaced by custom header */
+  h2 {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1.5px solid #cbd5e1;
+    padding-bottom: 5px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+  p, ul, ol {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
+  ul, ol {
+    padding-left: 20px;
+  }
+  li {
+    margin-bottom: 3px;
+  }
+  code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 8pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2px 4px;
+    border-radius: 3px;
+    border: 1px solid #e2e8f0;
+  }
+  pre {
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 5px;
+    font-size: 7.5pt;
+    line-height: 1.35;
+    overflow-x: auto;
+    page-break-inside: avoid;
+    margin: 10px 0;
+  }
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    border: none;
+  }
+  blockquote {
+    border-left: 3px solid #e11d48;
+    margin: 10px 0;
+    padding: 6px 12px;
+    background-color: #fff1f2;
+    color: #9f1239;
+    font-size: 9pt;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 8pt;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+  }
+  tr:nth-child(even) {
+    background-color: #fcfcfd;
+  }
+  hr {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 18px 0;
+  }
+
+  /* Formal Corporate Sign-off Table */
+  .sign-off-wrapper {
+    margin-top: 24px;
+    page-break-inside: avoid;
+  }
+  table.sign-off-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid #0f172a;
+    margin-top: 8px;
+  }
+  table.sign-off-table th {
+    background-color: #f8fafc;
+    color: #0f172a;
+    font-weight: 700;
+    font-size: 8.5pt;
+    text-align: center;
+    border: 1px solid #0f172a;
+    padding: 8px 6px;
+    width: 33.33%;
+  }
+  table.sign-off-table td {
+    border: 1px solid #0f172a;
+    padding: 0;
+    vertical-align: top;
+  }
+  .sign-cell {
+    display: flex;
+    flex-direction: column;
+    height: 180px;
+    box-sizing: border-box;
+  }
+  .sign-role-title {
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 700;
+  }
+  .sign-person-name {
+    font-size: 9.5pt;
+    color: #0f172a;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .sign-box-empty {
+    flex: 1;
+    border: 1px dashed #cbd5e1;
+    margin: 8px 10px;
+    border-radius: 4px;
+    background-color: #fcfcfd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sign-box-placeholder {
+    font-size: 7.5pt;
+    color: #94a3b8;
+    font-style: italic;
+  }
+  .sign-meta-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 6px 10px;
+    font-size: 7.5pt;
+    color: #334155;
+    background-color: #ffffff;
+  }
+  .sign-meta-row {
+    margin-bottom: 2px;
+  }
+</style>
+</head>
+<body>
+  
+  <div class="doc-header-banner">
+    <div>
+      <div class="doc-title-main">LOW LEVEL DESIGN DOCUMENT</div>
+      <div class="doc-subtitle">Real-Time Luxury Auction Engine</div>
+      <div class="doc-category">Core Engine, Bidding Lua & API Implementation</div>
+    </div>
+    <div style="text-align: right; font-size: 8pt; color: #64748b;">
+      <div><strong>Enterprise Architecture</strong></div>
+      <div>Confidential - Internal Project</div>
+    </div>
+  </div>
+  <h1>LOW LEVEL DESIGN DOCUMENT</h1>
+<h2>Real-Time Luxury Auction Engine</h2>
+<h3>Core Engine, Bidding Lua &amp; API Implementation</h3>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Prepared By :</strong></td>
+<td>System Architecture &amp; Delivery Team</td>
+</tr>
+<tr>
+<td><strong>Date :</strong></td>
+<td>24 Oct 2026</td>
+</tr>
+<tr>
+<td><strong>Version :</strong></td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. Governance</h2>
+<h3>1.1 Contributors</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Position</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daniel H. S.</td>
+<td>System Analyst / Solution Architect</td>
+</tr>
+<tr>
+<td>Alini</td>
+<td>Technical Lead</td>
+</tr>
+<tr>
+<td>Geri Setyo Andrian</td>
+<td>Project Manager</td>
+</tr>
+</tbody>
+</table>
+<h3>1.2 Approvals</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Position</th>
+<th style="text-align:center">Date</th>
+<th style="text-align:center">Signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Geri Setyo Andrian</td>
+<td>Project Manager Delivery Team</td>
+<td style="text-align:center">24 Oct 2026</td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+</tr>
+<tr>
+<td>Alini</td>
+<td>Technical Architect / Tech Lead Delivery Team</td>
+<td style="text-align:center">24 Oct 2026</td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+</tr>
+<tr>
+<td>Daniel H. S.</td>
+<td>System Analyst Delivery Team</td>
+<td style="text-align:center">24 Oct 2026</td>
+<td style="text-align:center"><code>[ APPROVED &amp; SIGNED ]</code></td>
+</tr>
+</tbody>
+</table>
+<h3>1.3 Revision History</h3>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Author</th>
+<th>Summary of Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.1</td>
+<td>24 Oct 2026</td>
+<td>Daniel H. S.</td>
+<td>Initial Technical Draft (Components &amp; Goroutines)</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td>24 Oct 2026</td>
+<td>Daniel H. S.</td>
+<td>Added Lua Scripting Logic, Settlement Daemon, and 14 API Endpoints</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>24 Oct 2026</td>
+<td>Daniel H. S.</td>
+<td>Baseline Alignment with Enterprise Template Structure &amp; Sign-Off</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>2. Table of Contents</h2>
+<ul>
+<li><a href="#1-governance">1. Governance</a>
+<ul>
+<li><a href="#11-contributors">1.1 Contributors</a></li>
+<li><a href="#12-approvals">1.2 Approvals</a></li>
+<li><a href="#13-revision-history">1.3 Revision History</a></li>
+</ul>
+</li>
+<li><a href="#2-table-of-contents">2. Table of Contents</a></li>
+<li><a href="#3-introduction">3. Introduction</a>
+<ul>
+<li><a href="#31-low-level-design-overview">3.1 Low-Level Design Overview</a></li>
+<li><a href="#32-glossaries">3.2 Glossaries</a></li>
+<li><a href="#33-objective-overview">3.3 Objective Overview</a></li>
+<li><a href="#34-references">3.4 References</a></li>
+</ul>
+</li>
+<li><a href="#4-system--integration-landscape">4. System &amp; Integration Landscape</a>
+<ul>
+<li><a href="#41-component-interaction">4.1 Component Interaction</a></li>
+<li><a href="#42-impacted-objects--detailed-functionality">4.2 Impacted Objects &amp; Detailed Functionality</a></li>
+</ul>
+</li>
+<li><a href="#5-detailed-sequence-diagrams--algorithms">5. Detailed Sequence Diagrams &amp; Algorithms</a>
+<ul>
+<li><a href="#51-incremental-bid-execution-bid_placementlua">5.1 Incremental Bid Execution (bid_placement.lua)</a></li>
+<li><a href="#52-settlement-daemon-expiry-flow">5.2 Settlement Daemon Expiry Flow</a></li>
+</ul>
+</li>
+<li><a href="#6-application-interfaces--api-contracts">6. Application Interfaces &amp; API Contracts</a>
+<ul>
+<li><a href="#61-complete-endpoint-specifications">6.1 Complete Endpoint Specifications</a></li>
+<li><a href="#62-websocket--real-time-event-bus">6.2 WebSocket &amp; Real-Time Event Bus</a></li>
+</ul>
+</li>
+<li><a href="#7-in-memory-caching--data-structures">7. In-Memory, Caching &amp; Data Structures</a>
+<ul>
+<li><a href="#71-in-memory-atomic-scripts-lua-engine">7.1 In-Memory Atomic Scripts (Lua Engine)</a></li>
+<li><a href="#72-caching-key-schemas">7.2 Caching Key Schemas</a></li>
+</ul>
+</li>
+<li><a href="#8-state-machine--lifecycle-specifications">8. State Machine &amp; Lifecycle Specifications</a></li>
+<li><a href="#9-document-sign-off-section">9. Document Sign-Off Section</a></li>
+</ul>
+<hr>
+<h2>3. Introduction</h2>
+<h3>3.1 Low-Level Design Overview</h3>
+<p>Dokumen Low-Level Design (LLD) ini menguraikan spesifikasi implementasi perangkat lunak pada tingkat kode, skrip in-memory, antarmuka REST API, WebSocket pub/sub, dan state machine database untuk <strong>Real-Time Luxury Auction Engine</strong>.</p>
+<h3>3.2 Glossaries</h3>
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Terms</th>
+<th>Expansion</th>
+<th>Definition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>EVALSHA</strong></td>
+<td>Evaluate SHA1 Digest</td>
+<td>Perintah Redis untuk mengeksekusi skrip Lua yang telah di-cache server secara atomic.</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>BYTEA</strong></td>
+<td>Byte Array</td>
+<td>Tipe data kolom PostgreSQL untuk menyimpan representasi biner gambar produk secara langsung.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>ZSET</strong></td>
+<td>Sorted Set</td>
+<td>Struktur data Redis berurutan berdasarkan score waktu untuk tracking expiry lelang.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Base64</strong></td>
+<td>Binary-to-Text Encoding</td>
+<td>Skema representasi string data biner untuk transfer respons JSON ke antarmuka front-end.</td>
+</tr>
+</tbody>
+</table>
+<h3>3.3 Objective Overview</h3>
+<p>Menyediakan instruksi teknis langsung bagi tim engineering untuk membangun modul Golang backend, mengonfigurasi skrip Redis Lua, dan menghubungkan Next.js web client sesuai standar kualitas TDD.</p>
+<h3>3.4 References</h3>
+<ul>
+<li><strong>High-Level Design Document:</strong> [<code>high-level-design.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/04_Design/high-level-design.md)</li>
+<li><strong>Database Schema &amp; Redis Lua Design:</strong> [<code>database-schema.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/06_Data_Design/database-schema.md)</li>
+<li><strong>API Contracts Specification:</strong> [<code>api-contracts.md</code>](file:///d:/Projects/Salt-Hackaton-2026/02_Projects/real-time-auction-engine/05_Integration/api-contracts.md)</li>
+</ul>
+<hr>
+<h2>4. System &amp; Integration Landscape</h2>
+<h3>4.1 Component Interaction</h3>
+<p>Interaksi antar-komponen di dalam modul Golang dan external service:</p>
+<pre><code class="language-mermaid">flowchart TD
+    subgraph Client [&quot;Client Presentation&quot;]
+        NextJS[&quot;Next.js Web App&quot;]
+    end
+
+    subgraph Transport [&quot;Transport Layer&quot;]
+        HTTPHandler[&quot;Gin / Chi Router&quot;]
+        WSHandler[&quot;Gorilla WebSocket Conn Manager&quot;]
+    end
+
+    subgraph Usecase [&quot;Business Logic Layer&quot;]
+        AuthUC[&quot;Auth Usecase&quot;]
+        BidUC[&quot;Bid Engine Usecase&quot;]
+        LotUC[&quot;Lot Catalog Usecase&quot;]
+        SettleDaemon[&quot;Settlement Daemon Goroutine&quot;]
+    end
+
+    subgraph Repository [&quot;Data Access Layer&quot;]
+        RedisRepo[&quot;Redis Hot-Path Client&quot;]
+        PGRepo[&quot;PostgreSQL GORM / SQLx Repo&quot;]
+    end
+
+    NextJS --&gt;|HTTP REST| HTTPHandler
+    NextJS &lt;--&gt;|WSS Duplex| WSHandler
+    HTTPHandler --&gt; AuthUC
+    HTTPHandler --&gt; BidUC
+    HTTPHandler --&gt; LotUC
+    BidUC --&gt; RedisRepo
+    LotUC --&gt; PGRepo
+    SettleDaemon --&gt; RedisRepo
+    SettleDaemon --&gt; PGRepo
+    RedisRepo --&gt;|Pub/Sub Event| WSHandler
+</code></pre>
+<h3>4.2 Impacted Objects &amp; Detailed Functionality</h3>
+<table>
+<thead>
+<tr>
+<th>No</th>
+<th>Impact</th>
+<th>Object Name</th>
+<th>Functions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>New</strong></td>
+<td><code>internal/domain</code></td>
+<td>Definisi struct murni: <code>User</code>, <code>Wallet</code>, <code>Auction</code>, <code>Bid</code>, <code>LedgerEntry</code> (seluruh atribut moneter menggunakan <code>float64</code>).</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>New</strong></td>
+<td><code>internal/usecase/bid</code></td>
+<td>Validasi kelipatan tombol bid diskrit, kalkulasi buy-out, pemicu Lua atomik.</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>New</strong></td>
+<td><code>internal/usecase/auth</code></td>
+<td>Login NIRO SSO, progressive lockout Superadmin, serta <strong>Token Revocation (Auto-Logout)</strong> saat user dipromosikan ke <code>ADMIN</code>.</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>New</strong></td>
+<td><code>internal/repository/redis</code></td>
+<td>Eksekusi EVALSHA <code>bid_placement.lua</code>, manajemen connection pool, ZSET expiry index, dan tracking <code>token_version:{user_id}</code>.</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>New</strong></td>
+<td><code>internal/transport/ws</code></td>
+<td>Multiplexing koneksi WebSocket per lot lelang dan proteksi heart-beat ping/pong.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>5. Detailed Sequence Diagrams &amp; Algorithms</h2>
+<h3>5.1 Incremental Bid Execution (bid_placement.lua)</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    autonumber
+    participant UI as Next.js Client
+    participant API as Bid Usecase
+    participant Lua as Redis (bid_placement.lua)
+    participant PS as Redis Pub/Sub
+    participant PG as PostgreSQL (bids table)
+
+    UI-&gt;&gt;API: POST /api/v1/auctions/{id}/bids {step_increment: 5000000}
+    API-&gt;&gt;API: Hitung new_price = current_price + step_increment
+    API-&gt;&gt;Lua: EVALSHA bid_placement.lua (user_id, lot_id, new_price)
+    
+    critical Atomic Lua Execution
+        Lua-&gt;&gt;Lua: Cek lot status == 'ACTIVE' &amp; now &lt; end_time
+        Lua-&gt;&gt;Lua: Cek wallet available_balance &gt;= new_price
+        Lua-&gt;&gt;Lua: Deduct available_balance, Increase locked_balance
+        Lua-&gt;&gt;Lua: Update auction current_price &amp; highest_bidder_id
+        Lua-&gt;&gt;Lua: Evaluasi Anti-Sniping (Velocity &gt;= 10 bid/s dalam 2 menit akhir)
+        Lua-&gt;&gt;Lua: Jika triggered: end_time = end_time + extend_minutes
+        Lua-&gt;&gt;Lua: Evaluasi Capped Ceiling (jika new_price &gt;= ceiling -&gt; status = CLOSED_AWARDED)
+    end
+    
+    Lua--&gt;&gt;API: Return {status: 'OK', new_price, bidder_id, end_time}
+    API-&gt;&gt;PS: PUBLISH auction:{id}:events {payload JSON}
+    API-)PG: Async insert log bid
+    API--&gt;&gt;UI: 200 OK {status: 'BID_ACCEPTED'}
+</code></pre>
+<h3>5.2 Settlement Daemon Expiry Flow</h3>
+<pre><code class="language-mermaid">sequenceDiagram
+    autonumber
+    participant Daemon as Settlement Daemon (Ticker 1s)
+    participant Redis as Redis ZSET
+    participant Lock as Redis Distributed Lock
+    participant DB as PostgreSQL (ACID Ledger)
+
+    Daemon-&gt;&gt;Redis: ZRANGEBYSCORE auctions:expiry_zset -inf (now)
+    Redis--&gt;&gt;Daemon: Daftar lot_id yang kedaluwarsa
+    loop Setiap Lot Terpilih
+        Daemon-&gt;&gt;Lock: SET lock:settle:{lot_id} &quot;locked&quot; NX EX 10
+        alt Berhasil Dapatkan Lock
+            Daemon-&gt;&gt;Redis: HGETALL auction:{lot_id}
+            Redis--&gt;&gt;Daemon: Data final pemenang &amp; harga lelang
+            Daemon-&gt;&gt;DB: BEGIN TRANSACTION (SERIALIZABLE)
+            Daemon-&gt;&gt;DB: Potong permanen locked_balance pemenang
+            Daemon-&gt;&gt;DB: Ubah status auction menjadi 'SETTLED'
+            Daemon-&gt;&gt;DB: Insert ledger_entries 'AUCTION_WIN_PAYMENT'
+            Daemon-&gt;&gt;DB: Terbitkan kepemilikan di asset_ownership
+            Daemon-&gt;&gt;DB: Release agunan seluruh penawar yang kalah
+            Daemon-&gt;&gt;DB: COMMIT TRANSACTION
+            Daemon-&gt;&gt;Redis: DEL auction:{lot_id} &amp; ZREM auctions:expiry_zset {lot_id}
+            Daemon-&gt;&gt;Lock: DEL lock:settle:{lot_id}
+        else Gagal Lock
+            Note over Daemon: Instance lain sedang memproses lot ini
+        end
+    end
+</code></pre>
+<h3>5.3 Role Promotion &amp; Mandatory Auto-Logout Sequence</h3>
+<p>Ketika Superadmin mempromosikan user dari <code>BIDDER</code> menjadi <code>ADMIN</code> (Auction Manager), sesi lama user wajib dibatalkan seketika agar hak akses lama tidak disalahgunakan.</p>
+<pre><code class="language-mermaid">sequenceDiagram
+    autonumber
+    actor Super as Superadmin Platform
+    participant UI as Admin Console
+    participant UC as AdminUserUsecase
+    participant Redis as Redis Session Cache
+    participant DB as PostgreSQL
+    actor User as Pengguna (Mantan Bidder)
+
+    Super-&gt;&gt;UI: Klik Promosikan ke Auction Manager (ADMIN)
+    UI-&gt;&gt;UC: PATCH /api/v1/admin/users/{id}/role {role: &quot;ADMIN&quot;}
+    UC-&gt;&gt;DB: UPDATE users SET role = 'ADMIN', updated_at = NOW() WHERE id = $1
+    UC-&gt;&gt;Redis: INCR token_version:{user_id}
+    Note over Redis: Token JWT lama otomatis INVALID karena token_version tidak cocok
+    UC--&gt;&gt;UI: 200 OK {&quot;status&quot;: &quot;success&quot;, &quot;data&quot;: {&quot;new_role&quot;: &quot;ADMIN&quot;}}
+    
+    par Klien Pengguna Mencoba Akses
+        User-&gt;&gt;UC: Request API dengan Token JWT Lama
+        UC-&gt;&gt;Redis: Validasi token_version
+        Redis--&gt;&gt;UC: Version Mismatch (Revoked)
+        UC--&gt;&gt;User: 401 Unauthorized {&quot;status&quot;: &quot;error&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;AUTH_TOKEN_REVOKED&quot;, &quot;message&quot;: &quot;Peran Anda telah diperbarui. Silakan login kembali.&quot;}}
+        User-&gt;&gt;User: Auto-Logout &amp; Redirect ke Halaman Login NIRO
+    end
+</code></pre>
+<hr>
+<h2>6. Application Interfaces &amp; API Contracts</h2>
+<h3>6.1 Complete Endpoint Specifications</h3>
+<p>Berikut adalah 14 endpoint implementasi transport API pada sistem:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Endpoint</th>
+<th>Role</th>
+<th>Penjelasan Fungsional &amp; Kontrak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auth/niro/authorize-url</code></td>
+<td>Publik</td>
+<td>Mendapatkan redirect URL resmi NIRO SSO beserta CSRF state.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/niro</code></td>
+<td>Publik</td>
+<td>Menerima <code>niro_token</code>. Jika baru, auto-register role <code>BIDDER</code>; jika sudah ada, buat session JWT.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auth/login/email</code></td>
+<td>Publik</td>
+<td>Login email &amp; password (min. 12 char) khusus <code>SUPERADMIN</code> dengan progressive lockout.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/admin/users</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mengambil daftar pengguna terdaftar NIRO (lengkap dengan pagination meta).</td>
+</tr>
+<tr>
+<td><code>PATCH</code></td>
+<td><code>/api/v1/admin/users/:id/role</code></td>
+<td><code>SUPERADMIN</code></td>
+<td>Mempromosikan role user dari <code>BIDDER</code> menjadi <code>ADMIN</code> (Auction Manager).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/wallet/me</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengambil informasi saldo likuid (<code>available_balance</code>) dan tertahan (<code>locked_balance</code>).</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/wallet/topup</code></td>
+<td><code>BIDDER</code></td>
+<td>Menambah saldo e-wallet khusus penawar (minimal deposit Rp 100.000).</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/active</code></td>
+<td>Publik</td>
+<td>Daftar lot barang mewah aktif, pagination meta, dan thumbnail Base64 terkompresi.</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/api/v1/auctions/:id</code></td>
+<td>Publik</td>
+<td>Detail lengkap lot, foto Base64 utuh, step increment tombol, dan jaminan keaslian.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/bids</code></td>
+<td><code>BIDDER</code></td>
+<td>Mengirim penawaran tombol bertingkat diskrit; validasi instant buy-out &amp; anti-sniping.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Konfigurasi bot penawaran bertingkat dengan batas limit penawaran maksimal.</td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td><code>/api/v1/auctions/:id/proxy-bid</code></td>
+<td><code>BIDDER</code></td>
+<td>Membatalkan konfigurasi bot proxy penawaran pada lot tertentu.</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/api/v1/admin/auctions</code></td>
+<td><code>ADMIN</code></td>
+<td>Membuat lot baru via form biner multipart (<code>image</code> disimpan di DB <code>BYTEA</code>), durasi extend lot.</td>
+</tr>
+<tr>
+<td><code>WS</code></td>
+<td><code>/api/v1/ws/auctions</code></td>
+<td>Universal</td>
+<td>Channel WebSocket streaming mutasi harga, countdown timer, dan event lelang.</td>
+</tr>
+</tbody>
+</table>
+<h3>6.2 WebSocket &amp; Real-Time Event Bus</h3>
+<ul>
+<li><strong>Protokol:</strong> Dupleks penuh WebSocket JSON Frame.</li>
+<li><strong>Keep-Alive:</strong> Klien mengirim <code>ping</code> setiap 30 detik; server menjawab <code>pong</code>.</li>
+<li><strong>Struktur Pesan Broadcast:</strong></li>
+</ul>
+<pre><code class="language-json">{
+  &quot;event&quot;: &quot;PRICE_UPDATED&quot;,
+  &quot;data&quot;: {
+    &quot;lot_id&quot;: &quot;9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d&quot;,
+    &quot;current_price&quot;: 125000000,
+    &quot;highest_bidder_masked&quot;: &quot;Us***78&quot;,
+    &quot;end_time&quot;: &quot;2026-10-25T14:00:00Z&quot;,
+    &quot;is_extended&quot;: true
+  }
+}
+</code></pre>
+<hr>
+<h2>7. In-Memory, Caching &amp; Data Structures</h2>
+<h3>7.1 In-Memory Atomic Scripts (Lua Engine)</h3>
+<p>Logika transaksi hot-path dijalankan secara atomik melalui skrip <code>bid_placement.lua</code>:</p>
+<ul>
+<li>Validasi status lot lelang (<code>ACTIVE</code>).</li>
+<li>Verifikasi saldo <code>available_balance &gt;= target_bid</code>.</li>
+<li>Pemotongan <code>available_balance</code> dan pemindahan dana ke <code>locked_balance</code>.</li>
+<li><em>Catatan Bisnis:</em> Dana penawar sebelumnya tetap tersimpan di <code>locked_balance</code> hingga lelang mencapai settlement akhir.</li>
+<li>Penghitungan lonjakan velositas penawaran dalam jendela 2 menit terakhir (jika $\ge 10\text{ bid/s}$, perpanjang <code>end_time</code>).</li>
+</ul>
+<h3>7.2 Caching Key Schemas</h3>
+<ul>
+<li><code>auction:{lot_id}</code> (Type: <code>HASH</code>): Status lot lelang, harga terkini, waktu berakhir, ceiling valuation.</li>
+<li><code>wallet:{user_id}</code> (Type: <code>HASH</code>): Saldo bebas (<code>available_balance</code>) dan tertahan (<code>locked_balance</code>).</li>
+<li><code>auctions:expiry_zset</code> (Type: <code>ZSET</code>): Indexing lelang aktif dengan score <code>end_time</code> epoch timestamp.</li>
+<li><code>lockout:superadmin:{email}</code> (Type: <code>STRING</code>): TTL counter progressive lockout email superadmin.</li>
+</ul>
+<hr>
+<h2>8. State Machine &amp; Lifecycle Specifications</h2>
+<pre><code class="language-mermaid">stateDiagram-v2
+    [*] --&gt; DRAFT : AM Create Lot
+    DRAFT --&gt; ACTIVE : Scheduled Start Time Reached
+    ACTIVE --&gt; CLOSED_AWARDED : Buyout Ceiling Reached
+    ACTIVE --&gt; CLOSED_AWARDED : Time-Window Ended with Highest Bidder
+    ACTIVE --&gt; EXPIRED_UNSOLD : Time Ended without any Bid
+    CLOSED_AWARDED --&gt; SETTLED : Settlement Daemon Debits Winner Funds
+    EXPIRED_UNSOLD --&gt; SETTLED : Daemon Releases All Holds
+    SETTLED --&gt; [*]
+</code></pre>
+<hr>
+<h2>9. Document Sign-Off Section</h2>
+<p>Dokumen perancangan tingkat rendah (<em>Low-Level Design</em>) ini telah ditinjau secara mendalam dari segi kelayakan teknis, struktur data, algoritma usecase, dan kesiapan pengujian TDD, serta secara resmi disahkan untuk tahap koding.</p>
+
+<div class="sign-off-wrapper">
+  <table class="sign-off-table">
+    <thead>
+      <tr>
+        <th>
+          <div class="sign-role-title">Project Manager</div>
+          <div class="sign-person-name">Geri Setyo Andrian</div>
+        </th>
+        <th>
+          <div class="sign-role-title">Tech Lead / Technical Architect</div>
+          <div class="sign-person-name">Alini</div>
+        </th>
+        <th>
+          <div class="sign-role-title">System Analyst / Solution Architect</div>
+          <div class="sign-person-name">Daniel H. S.</div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="sign-cell">
+            <div class="sign-box-empty">
+              <span class="sign-box-placeholder">[ Tanda Tangan / Signature ]</span>
+            </div>
+            <div class="sign-meta-footer">
+              <div class="sign-meta-row"><strong>Tanggal:</strong> ____ / ____ / 2026</div>
+              <div class="sign-meta-row"><strong>Status:</strong> [ &nbsp; ] Disetujui &nbsp; [ &nbsp; ] Revisi</div>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+</body>
+</html>

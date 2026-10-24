@@ -64,7 +64,7 @@ flowchart TD
     SuperForm --> CheckLock{"Apakah Akun Sedang Dalam Masa Lockout?"}
     CheckLock -->|Ya: Sedang Masa Tunggu| ShowLockMsg["Tampilkan Pesan Lockout:\n'Terlalu banyak percobaan gagal. Silakan tunggu X detik/menit.'"]
     
-    CheckLock -->|Tidak Terkunci| PostSuper["POST /api/v1/auth/login-superadmin"]
+    CheckLock -->|Tidak Terkunci| PostSuper["POST /api/v1/auth/login/email"]
     PostSuper --> VerifyCred{"Kredensial Email & Password Valid?"}
     
     VerifyCred -->|Sah| ResetCounter["Reset Counter Gagal -> Berikan Akses Superadmin"]

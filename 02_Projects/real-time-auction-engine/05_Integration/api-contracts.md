@@ -16,22 +16,19 @@
 ### Respon Sukses (HTTP 200 / 201)
 ```json
 {
-  "success": true,
-  "data": {},
-  "timestamp": "2026-10-24T12:00:00.000Z"
+  "status": "success",
+  "data": {}
 }
 ```
 
 ### Respon Gagal (HTTP 400 / 401 / 403 / 404 / 409 / 500)
 ```json
 {
-  "success": false,
+  "status": "error",
   "error": {
     "code": "ERROR_CODE_STRING",
-    "message": "Pesan deskripsi kesalahan dalam bahasa Indonesia.",
-    "details": null
-  },
-  "timestamp": "2026-10-24T12:00:00.000Z"
+    "message": "Pesan deskripsi kesalahan dalam bahasa Indonesia."
+  }
 }
 ```
 
@@ -48,12 +45,11 @@ Frontend (Next.js) memanggil endpoint ini ketika pengguna mengklik tombol *"Logi
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "redirect_url": "https://auth.niro.internal/oauth2/authorize?client_id=salt_auction_web&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&state=sec_state_981247",
       "state": "sec_state_981247"
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 
@@ -78,7 +74,7 @@ Setelah Frontend membuka URL redirect NIRO, pengguna berhasil login di sistem NI
 * **Response 200 OK (Pengguna Sudah Terdaftar — Berhasil Loginkan):**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "is_new_user": false,
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
@@ -95,14 +91,13 @@ Setelah Frontend membuka URL redirect NIRO, pengguna berhasil login di sistem NI
         "locked_balance": 0.00,
         "total_balance": 150000000.00
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 201 Created (Pengguna Belum Terdaftar — Berhasil Didaftarkan Otomatis):**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "is_new_user": true,
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
@@ -119,20 +114,17 @@ Setelah Frontend membuka URL redirect NIRO, pengguna berhasil login di sistem NI
         "locked_balance": 0.00,
         "total_balance": 0.00
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 401 Unauthorized (Token NIRO Invalid/Expired):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_INVALID_NIRO_TOKEN",
-      "message": "Token otentikasi NIRO tidak valid atau telah kedaluwarsa.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+      "message": "Token otentikasi NIRO tidak valid atau telah kedaluwarsa."
+    }
   }
   ```
 
@@ -158,7 +150,7 @@ Login terisolasi khusus Superadmin platform lelang menggunakan Email dan Passwor
 * **Response 200 OK (Login Berhasil):**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.superadmin_jwt...",
       "user": {
@@ -168,28 +160,26 @@ Login terisolasi khusus Superadmin platform lelang menggunakan Email dan Passwor
         "auth_provider": "INTERNAL",
         "role": "SUPERADMIN"
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 401 Unauthorized (Kredensial Salah):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_INVALID_CREDENTIALS",
       "message": "Email atau kata sandi salah.",
       "details": {
         "remaining_attempts_before_lock": 2
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 429 Too Many Requests (Akun Terkunci Sementara - Lockout):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_ACCOUNT_TEMPORARILY_LOCKED",
       "message": "Terlalu banyak percobaan login gagal berturut-turut. Akun Anda dikunci sementara selama 60 detik. Silakan coba lagi nanti.",
@@ -197,8 +187,7 @@ Login terisolasi khusus Superadmin platform lelang menggunakan Email dan Passwor
         "retry_after_seconds": 60,
         "lockout_level": 1
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 
@@ -212,7 +201,7 @@ Mengambil daftar pengguna login NIRO untuk dikelola oleh Superadmin.
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "users": [
         {
@@ -231,20 +220,17 @@ Mengambil daftar pengguna login NIRO untuk dikelola oleh Superadmin.
         "total_items": 1,
         "total_pages": 1
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 403 Forbidden:**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_FORBIDDEN_ACCESS",
-      "message": "Akses ditolak. Endpoint ini hanya dapat diakses oleh Superadmin.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+      "message": "Akses ditolak. Endpoint ini hanya dapat diakses oleh Superadmin."
+    }
   }
   ```
 
@@ -263,27 +249,24 @@ Superadmin mempromosikan pengguna login NIRO menjadi **ADMIN** (Auction Manager)
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       "username": "budi_kolektor",
       "previous_role": "BIDDER",
       "new_role": "ADMIN",
       "updated_at": "2026-10-24T12:05:00.000Z"
-    },
-    "timestamp": "2026-10-24T12:05:00.000Z"
+    }
   }
   ```
 * **Response 404 Not Found:**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_USER_NOT_FOUND",
-      "message": "Pengguna dengan ID tersebut tidak ditemukan.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:05:00.000Z"
+      "message": "Pengguna dengan ID tersebut tidak ditemukan."
+    }
   }
   ```
 
@@ -298,14 +281,13 @@ Mengambil informasi saldo pengguna saat ini.
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
       "available_balance": 25000000.00,
       "locked_balance": 75000000.00,
       "total_balance": 100000000.00
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 
@@ -325,59 +307,52 @@ Sesuai aturan bisnis **US-001**, **hanya Bidder yang dapat melakukan top-up**, d
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "topup_amount": 50000000.00,
       "previous_available_balance": 25000000.00,
       "new_available_balance": 75000000.00,
       "locked_balance": 75000000.00,
       "total_balance": 150000000.00
-    },
-    "timestamp": "2026-10-24T12:10:00.000Z"
+    }
   }
   ```
 * **Response 400 Bad Request (Nominal di Bawah Minimal Rp 100.000):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_MINIMUM_TOPUP_AMOUNT",
       "message": "Minimum top up is IDR 100,000.",
       "details": {
         "minimum_required": 100000.00
       }
-    },
-    "timestamp": "2026-10-24T12:10:00.000Z"
+    }
   }
   ```
 * **Response 403 Forbidden (Bukan Bidder):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_FORBIDDEN_ROLE",
-      "message": "Akses ditolak. Fitur dompet dan top-up hanya dapat diakses oleh peran Bidder.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:10:00.000Z"
+      "message": "Akses ditolak. Fitur dompet dan top-up hanya dapat diakses oleh peran Bidder."
+    }
   }
   ```
       "locked_balance": 75000000.00,
       "total_balance": 150000000.00
-    },
-    "timestamp": "2026-10-24T12:10:00.000Z"
+    }
   }
   ```
 * **Response 400 Bad Request:**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_INVALID_TOPUP_AMOUNT",
-      "message": "Nominal top-up harus berupa angka positif lebih dari nol.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:10:00.000Z"
+      "message": "Nominal top-up harus berupa angka positif lebih dari nol."
+    }
   }
   ```
 
@@ -393,7 +368,7 @@ Gambar aset di-return dalam format **Base64 Compressed String** (hasil decode da
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "auctions": [
         {
@@ -420,8 +395,7 @@ Gambar aset di-return dalam format **Base64 Compressed String** (hasil decode da
         "total_items": 1,
         "total_pages": 1
       }
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 
@@ -433,7 +407,7 @@ Mengambil detail spesifikasi satu lot barang bernilai tinggi beserta riwayat pen
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "lot": {
         "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
@@ -462,20 +436,17 @@ Mengambil detail spesifikasi satu lot barang bernilai tinggi beserta riwayat pen
           "created_at": "2026-10-24T12:15:30.000Z"
         }
       ]
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+    }
   }
   ```
 * **Response 404 Not Found:**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_AUCTION_NOT_FOUND",
-      "message": "Lot lelang dengan ID tersebut tidak ditemukan.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
+      "message": "Lot lelang dengan ID tersebut tidak ditemukan."
+    }
   }
   ```
 
@@ -498,7 +469,7 @@ Sistem secara otomatis mengevaluasi:
 * **Response 200 OK (Tawaran Sukses & Memimpin):**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
       "new_current_price": 390000000.00,
@@ -511,14 +482,13 @@ Sistem secara otomatis mengevaluasi:
       "time_extended": false,
       "new_end_time": "2026-10-25T12:00:00.000Z",
       "buyout_triggered": false
-    },
-    "timestamp": "2026-10-24T12:20:00.000Z"
+    }
   }
   ```
 * **Response 200 OK (Mencapai/Melebihi Ceiling — Instant Buyout Terpicu Otomatis):**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
       "new_current_price": 500000000.00,
@@ -531,32 +501,27 @@ Sistem secara otomatis mengevaluasi:
       "time_extended": false,
       "buyout_triggered": true,
       "auction_status": "CLOSED_AWARDED"
-    },
-    "timestamp": "2026-10-24T12:25:00.000Z"
+    }
   }
   ```
 * **Response 400 Bad Request (Saldo Kurang):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_INSUFFICIENT_AVAILABLE_BALANCE",
-      "message": "Saldo bebas Anda (Rp 25.000.000) tidak mencukupi untuk tawaran sebesar Rp 390.000.000. Silakan lakukan Top-Up.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:20:00.000Z"
+      "message": "Saldo bebas Anda (Rp 25.000.000) tidak mencukupi untuk tawaran sebesar Rp 390.000.000. Silakan lakukan Top-Up."
+    }
   }
   ```
 * **Response 400 Bad Request (Lelang Sudah Ditutup):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_AUCTION_NOT_ACTIVE",
-      "message": "Lelang ini telah berakhir atau telah dimenangkan via Buyout.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:20:00.000Z"
+      "message": "Lelang ini telah berakhir atau telah dimenangkan via Buyout."
+    }
   }
   ```
 
@@ -577,7 +542,7 @@ Mendaftarkan atau memperbarui batas maksimal bot proxy bidding.
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
       "proxy_id": "b1827461-872b-42e7-91a6-f7615cb38421",
@@ -586,20 +551,17 @@ Mendaftarkan atau memperbarui batas maksimal bot proxy bidding.
       "current_auction_price": 395000000.00,
       "your_current_bid": 395000000.00,
       "status": "PROXY_ACTIVE_AND_LEADING"
-    },
-    "timestamp": "2026-10-24T12:26:00.000Z"
+    }
   }
   ```
 * **Response 400 Bad Request (Limit Lebih Kecil dari Harga Saat Ini):**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_PROXY_LIMIT_TOO_LOW",
-      "message": "Batas limit proxy harus lebih besar dari penawaran saat ini (Rp 390.000.000).",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:26:00.000Z"
+      "message": "Batas limit proxy harus lebih besar dari penawaran saat ini (Rp 390.000.000)."
+    }
   }
   ```
 
@@ -612,13 +574,12 @@ Membatalkan / menonaktifkan aturan bot proxy bidding aktif.
 * **Response 200 OK:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
       "is_active": false
     },
-    "message": "Aturan proxy bidding berhasil dinonaktifkan.",
-    "timestamp": "2026-10-24T12:27:00.000Z"
+    "message": "Aturan proxy bidding berhasil dinonaktifkan."
   }
   ```
 
@@ -648,7 +609,7 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
 * **Response 201 Created:**
   ```json
   {
-    "success": true,
+    "status": "success",
     "data": {
       "id": "c1f76d22-192a-4c28-8742-1928374aef12",
       "title": "Togo Leather Handbag 25 Gold Hardware",
@@ -663,20 +624,17 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
       "anti_sniping_extension_minutes": 2,
       "start_time": "2026-10-24T12:30:00.000Z",
       "end_time": "2026-10-25T12:30:00.000Z"
-    },
-    "timestamp": "2026-10-24T12:30:00.000Z"
+    }
   }
   ```
 * **Response 400 Bad Request:**
   ```json
   {
-    "success": false,
+    "status": "error",
     "error": {
       "code": "ERR_INVALID_AUCTION_PARAMS",
-      "message": "Harga maksimal harus bernilai lebih besar daripada harga minimal, dan file gambar wajib dilampirkan.",
-      "details": null
-    },
-    "timestamp": "2026-10-24T12:30:00.000Z"
+      "message": "Harga maksimal harus bernilai lebih besar daripada harga minimal, dan file gambar wajib dilampirkan."
+    }
   }
   ```
 
@@ -711,8 +669,7 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "highest_bidder_username": "budi_kolektor",
     "increment_added": 10000000.00,
     "total_bids_count": 28
-  },
-  "timestamp": "2026-10-24T12:20:00.120Z"
+  }
 }
 ```
 
@@ -725,8 +682,7 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "extension_seconds": 30,
     "new_end_time": "2026-10-25T12:00:30.000Z",
     "reason": "ANTI_SNIPING_TRIGGERED"
-  },
-  "timestamp": "2026-10-24T12:20:00.120Z"
+  }
 }
 ```
 
@@ -740,8 +696,7 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "winner_username": "budi_kolektor",
     "buyout_price": 500000000.00,
     "closed_reason": "VALUATION_CEILING_REACHED"
-  },
-  "timestamp": "2026-10-24T12:25:00.050Z"
+  }
 }
 ```
 
@@ -756,8 +711,7 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "winner_username": "andi_collector",
     "final_price": 310000000.00,
     "collateral_unfrozen_for_others": true
-  },
-  "timestamp": "2026-10-25T12:30:00.200Z"
+  }
 }
 ```
 
@@ -773,7 +727,6 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "starting_price": 250000000.00,
     "model_type": "CAPPED",
     "end_time": "2026-10-25T12:30:00.000Z"
-  },
-  "timestamp": "2026-10-24T12:30:00.000Z"
+  }
 }
 ```

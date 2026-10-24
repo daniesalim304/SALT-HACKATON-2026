@@ -75,7 +75,8 @@ erDiagram
         uuid id PK
         varchar title
         text description
-        varchar image_url
+        bytea image_data
+        varchar image_mime_type
         varchar model_type
         varchar status
         numeric starting_price
@@ -312,7 +313,6 @@ Redis digunakan sebagai *Single Source of Truth* untuk validasi real-time dan me
   ```text
   available_balance          -> "500000.00"   (Saldo bebas yang bisa dipakai bid)
   locked_balance             -> "120000.00"   (Saldo yang sedang aktif menawar di lot lelang)
-  reserved_minimum_balance   -> "100000.00"   (Saldo minimal tertahan / wajib mengendap)
   ```
 
 ### 4.3 Sorted Set: Indeks Expirations Daemon

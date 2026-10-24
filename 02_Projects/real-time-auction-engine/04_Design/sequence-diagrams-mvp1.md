@@ -75,7 +75,7 @@ sequenceDiagram
     participant DB as PostgreSQL Database
 
     Super->>UI: Input Email & Password (min. 12 karakter)
-    UI->>API: POST /api/v1/auth/login-superadmin {email, password}
+    UI->>API: POST /api/v1/auth/login/email {email, password}
     
     API->>Redis: GET lockout:superadmin:{email}
     alt Akun Masih Dalam Masa Lockout
