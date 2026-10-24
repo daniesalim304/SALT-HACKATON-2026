@@ -41,8 +41,32 @@
 
 ### MODUL 1: AUTENTIKASI DUAL-LOGIN & RBAC
 
-#### 1. `POST /auth/login-niro`
-Login SSO khusus peserta lelang menggunakan kredensial token dari sistem NIRO. Otomatis membuatkan akun lokal jika pertama kali masuk.
+#### 1. `GET /auth/niro/authorize-url`
+Frontend (Next.js) memanggil endpoint ini ketika pengguna mengklik tombol *"Login with NIRO"*. Endpoint ini mengembalikan URL redirect otorisasi SSO NIRO beserta state parameter untuk keamanan CSRF.
+
+* **Headers:** *None*
+* **Response 200 OK:**
+  ```json
+  {
+    "success": true,
+    "data": {
+      "redirect_url": "https://auth.niro.internal/oauth2/authorize?client_id=salt_auction_web&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&state=sec_state_981247",
+      "state": "sec_state_981247"
+    },
+    "timestamp": "2026-10-24T12:00:00.000Z"
+  }
+  ```
+
+---
+
+#### 2. `POST /auth/login/niro`
+Setelah Frontend membuka URL redirect NIRO, pengguna berhasil login di sistem NIRO dan FE mendapatkan token/kode NIRO. Frontend kemudian mengirimkan token NIRO tersebut ke Backend melalui endpoint ini.
+
+**Logika Pemeriksaan Akun di Backend:**
+- Backend memvalidasi token ke server NIRO dan mengekstrak identitas (`niro_user_id`, `email`, `username`).
+- Backend memeriksa tabel `users` berdasarkan `niro_user_id`:
+  - **Jika Belum Terdaftar:** Sistem secara otomatis **mendaftarkan akun baru** (`auth_provider = 'NIRO'`, role default `BIDDER`), membuatkan akun dompet (`available_balance = 0`, `locked_balance = 0`), dan menerbitkan token JWT sesi. Respon mengembalikan status `is_new_user: true` (HTTP 201).
+  - **Jika Sudah Terdaftar:** Sistem langsung **meloginkan pengguna**, memuat role terkini (`BIDDER` atau `ADMIN` jika sudah dipromosikan), dan menerbitkan token JWT sesi. Respon mengembalikan status `is_new_user: false` (HTTP 200).
 
 * **Headers:** `Content-Type: application/json`
 * **Request Body:**
@@ -51,11 +75,12 @@ Login SSO khusus peserta lelang menggunakan kredensial token dari sistem NIRO. O
     "niro_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.niro_sample_token..."
   }
   ```
-* **Response 200 OK (Pengguna Lama Terdaftar):**
+* **Response 200 OK (Pengguna Sudah Terdaftar — Berhasil Loginkan):**
   ```json
   {
     "success": true,
     "data": {
+      "is_new_user": false,
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
       "user": {
         "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
@@ -74,11 +99,12 @@ Login SSO khusus peserta lelang menggunakan kredensial token dari sistem NIRO. O
     "timestamp": "2026-10-24T12:00:00.000Z"
   }
   ```
-* **Response 201 Created (Pengguna Baru Pertama Kali):**
+* **Response 201 Created (Pengguna Belum Terdaftar — Berhasil Didaftarkan Otomatis):**
   ```json
   {
     "success": true,
     "data": {
+      "is_new_user": true,
       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
       "user": {
         "id": "7ca12345-5717-4562-b3fc-2c963f66bbbb",
@@ -97,7 +123,7 @@ Login SSO khusus peserta lelang menggunakan kredensial token dari sistem NIRO. O
     "timestamp": "2026-10-24T12:00:00.000Z"
   }
   ```
-* **Response 401 Unauthorized:**
+* **Response 401 Unauthorized (Token NIRO Invalid/Expired):**
   ```json
   {
     "success": false,
@@ -112,7 +138,7 @@ Login SSO khusus peserta lelang menggunakan kredensial token dari sistem NIRO. O
 
 ---
 
-#### 2. `POST /auth/login-superadmin`
+#### 3. `POST /auth/login/email`
 Login terisolasi khusus Superadmin platform lelang menggunakan Email dan Password internal (minimal 12 karakter), dilengkapi proteksi penguncian bertingkat (*Progressive Lockout*).
 
 *Aturan Kebijakan Gagal Login (Lockout):*
@@ -360,31 +386,41 @@ Sesuai aturan bisnis **US-001**, **hanya Bidder yang dapat melakukan top-up**, d
 ### MODUL 3: KATALOG LELANG BARANG MEWAH
 
 #### 7. `GET /auctions/active`
-Mengambil daftar snapshot seluruh lot barang bernilai tinggi aktif di pasar.
+Mengambil daftar snapshot seluruh lot barang bernilai tinggi yang sedang aktif di pasar, mendukung pagination.
+Gambar aset di-return dalam format **Base64 Compressed String** (hasil decode dari binary BLOB di DB).
 
+* **Query Params:** `?page=1&limit=10&category=LUXURY_WATCHES`
 * **Response 200 OK:**
   ```json
   {
     "success": true,
-    "data": [
-      {
-        "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-        "title": "Cosmograph Chronograph Steel 2023",
-        "category": "LUXURY_WATCHES",
-        "condition_grade": "MINT",
-        "authenticity_guarantee": "Full Set 2023, Box & Papers",
-        "image_url": "https://assets.salt-auction.com/chronograph.jpg",
-        "model_type": "CAPPED",
-        "status": "ACTIVE",
-        "starting_price": 350000000.00,
-        "current_price": 380000000.00,
-        "min_increment": 5000000.00,
-        "allowed_increment_steps": [5000000.00, 10000000.00, 25000000.00],
-        "valuation_ceiling": 500000000.00,
-        "highest_bidder_username": "andi_collector",
-        "end_time": "2026-10-25T12:00:00.000Z"
+    "data": {
+      "auctions": [
+        {
+          "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+          "title": "Cosmograph Chronograph Steel 2023",
+          "category": "LUXURY_WATCHES",
+          "condition_grade": "MINT",
+          "authenticity_guarantee": "Full Set 2023, Box & Papers",
+          "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
+          "model_type": "CAPPED",
+          "status": "ACTIVE",
+          "starting_price": 350000000.00,
+          "current_price": 380000000.00,
+          "min_increment": 5000000.00,
+          "allowed_increment_steps": [5000000.00, 10000000.00, 25000000.00],
+          "valuation_ceiling": 500000000.00,
+          "highest_bidder_username": "andi_collector",
+          "end_time": "2026-10-25T12:00:00.000Z"
+        }
+      ],
+      "pagination": {
+        "page": 1,
+        "limit": 10,
+        "total_items": 1,
+        "total_pages": 1
       }
-    ],
+    },
     "timestamp": "2026-10-24T12:00:00.000Z"
   }
   ```
@@ -406,7 +442,7 @@ Mengambil detail spesifikasi satu lot barang bernilai tinggi beserta riwayat pen
         "condition_grade": "MINT",
         "authenticity_guarantee": "Full Set 2023, Box & Papers",
         "description": "White dial, pristine condition, unworn.",
-        "image_url": "https://assets.salt-auction.com/chronograph.jpg",
+        "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
         "model_type": "CAPPED",
         "status": "ACTIVE",
         "starting_price": 350000000.00,
@@ -448,14 +484,15 @@ Mengambil detail spesifikasi satu lot barang bernilai tinggi beserta riwayat pen
 ### MODUL 4: PENAWARAN INKREMENTAL & SALDO TERTAHAN (HOT-PATH)
 
 #### 9. `POST /auctions/{id}/bids`
-Mengajukan tawaran lelang dengan memilih tombol inkremental resmi atau tombol buyout instan.
+Mengajukan tawaran lelang dengan memilih tombol inkremental resmi (atau menawar langsung nilai ceiling).
+Sistem secara otomatis mengevaluasi:
+- Jika `current_price + increment_amount >= valuation_ceiling`, lelang **LANGSUNG LAKU (*Instant Buyout*)** seketika tanpa perlu flag manual.
 
-* **Headers:** `Authorization: Bearer <JWT_TOKEN>`, `Content-Type: application/json`
-* **Request Body (Contoh 1: Klik Tombol +Rp 10.000.000):**
+* **Headers:** `Authorization: Bearer <BIDDER_JWT>`, `Content-Type: application/json`
+* **Request Body:**
   ```json
   {
-    "increment_amount": 10000000.00,
-    "is_buyout_instant": false
+    "increment_amount": 10000000.00
   }
   ```
 * **Response 200 OK (Tawaran Sukses & Memimpin):**
@@ -478,14 +515,7 @@ Mengajukan tawaran lelang dengan memilih tombol inkremental resmi atau tombol bu
     "timestamp": "2026-10-24T12:20:00.000Z"
   }
   ```
-* **Request Body (Contoh 2: Klik Tombol 'Buyout Langsung'):**
-  ```json
-  {
-    "increment_amount": 0,
-    "is_buyout_instant": true
-  }
-  ```
-* **Response 200 OK (Instant Buyout Tercapai — Barang Langsung Laku):**
+* **Response 200 OK (Mencapai/Melebihi Ceiling — Instant Buyout Terpicu Otomatis):**
   ```json
   {
     "success": true,
@@ -598,30 +628,23 @@ Membatalkan / menonaktifkan aturan bot proxy bidding aktif.
 
 #### 12. `POST /admin/auctions`
 Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
+- Endpoint ini menerima payload dalam format **`multipart/form-data`** karena menyertakan unggahan binary berkas gambar aset (`image`).
+- Gambar binary yang diunggah langsung disimpan di PostgreSQL sebagai **BLOB (`BYTEA`)** dan dikompresi menjadi format Base64 saat dibaca kembali.
+- Pengaturan perpanjangan waktu anti-sniping (`anti_sniping_extension_minutes`) dikonfigurasi langsung pada endpoint ini.
 
-*Parameter Konfigurasi:*
-- `min_price` (Wajib): Harga penawaran minimal awal.
-- `window_duration_seconds` (Wajib): Jendela waktu lelang (misal 86400 detik untuk 1 hari penuh).
-- `max_price` (Opsional): Harga batas atas (Buyout Langsung Laku).
-- `anti_sniping_extension_minutes` (Opsional): Durasi perpanjangan (misal: 2 menit, 5 menit) jika terjadi $\ge$ 10 hits penawaran per detik pada 2 menit terakhir lelang.
-
-* **Headers:** `Authorization: Bearer <ADMIN_JWT>`, `Content-Type: application/json`
-* **Request Body:**
-  ```json
-  {
-    "title": "Togo Leather Handbag 25 Gold Hardware",
-    "category": "DESIGNER_BAGS",
-    "condition_grade": "MINT",
-    "authenticity_guarantee": "Store Receipt 2024, Original Orange Box, Dustbag, CITES cert",
-    "description": "Store fresh condition, highly sought-after collector investment piece.",
-    "image_url": "https://assets.salt-auction.com/bag25-gold.jpg",
-    "min_price": 250000000.00,
-    "allowed_increment_steps": [5000000.00, 10000000.00, 20000000.00],
-    "max_price": 400000000.00,
-    "window_duration_seconds": 86400,
-    "anti_sniping_extension_minutes": 2
-  }
-  ```
+* **Headers:** `Authorization: Bearer <ADMIN_JWT>`, `Content-Type: multipart/form-data`
+* **Form Data Fields:**
+  - `title` (text): `"Togo Leather Handbag 25 Gold Hardware"`
+  - `category` (text): `"DESIGNER_BAGS"`
+  - `condition_grade` (text): `"MINT"`
+  - `authenticity_guarantee` (text): `"Store Receipt 2024, Original Orange Box, Dustbag, CITES cert"`
+  - `description` (text): `"Store fresh condition, highly sought-after collector investment piece."`
+  - `image` (binary file): `[File binary gambar JPEG/PNG/WEBP]`
+  - `min_price` (number): `250000000.00`
+  - `allowed_increment_steps` (json string): `"[5000000, 10000000, 20000000]"`
+  - `max_price` (number, opsional): `400000000.00`
+  - `window_duration_seconds` (number): `86400`
+  - `anti_sniping_extension_minutes` (number, opsional): `2`
 * **Response 201 Created:**
   ```json
   {
@@ -630,10 +653,14 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
       "id": "c1f76d22-192a-4c28-8742-1928374aef12",
       "title": "Togo Leather Handbag 25 Gold Hardware",
       "category": "DESIGNER_BAGS",
+      "condition_grade": "MINT",
+      "authenticity_guarantee": "Store Receipt 2024, Original Orange Box, Dustbag, CITES cert",
+      "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
       "model_type": "CAPPED",
       "status": "ACTIVE",
       "current_price": 250000000.00,
       "valuation_ceiling": 400000000.00,
+      "anti_sniping_extension_minutes": 2,
       "start_time": "2026-10-24T12:30:00.000Z",
       "end_time": "2026-10-25T12:30:00.000Z"
     },
@@ -646,59 +673,10 @@ Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
     "success": false,
     "error": {
       "code": "ERR_INVALID_AUCTION_PARAMS",
-      "message": "Harga maksimal harus bernilai lebih besar daripada harga minimal.",
+      "message": "Harga maksimal harus bernilai lebih besar daripada harga minimal, dan file gambar wajib dilampirkan.",
       "details": null
     },
     "timestamp": "2026-10-24T12:30:00.000Z"
-  }
-  ```
-
----
-
-### MODUL 7: KONFIGURASI SISTEM DINAMIS
-
-#### 13. `GET /admin/configs`
-Mengambil konfigurasi parameter dinamis lelang terkini.
-
-* **Headers:** `Authorization: Bearer <ADMIN_OR_SUPERADMIN_JWT>`
-* **Response 200 OK:**
-  ```json
-  {
-    "success": true,
-    "data": {
-      "anti_sniping_trigger_seconds": 15,
-      "anti_sniping_extension_seconds": 30,
-      "anti_sniping_max_extension_cap_seconds": 300
-    },
-    "timestamp": "2026-10-24T12:00:00.000Z"
-  }
-  ```
-
----
-
-#### 14. `PUT /admin/configs`
-Mengubah konfigurasi dinamis platform secara live tanpa restart server.
-
-* **Headers:** `Authorization: Bearer <ADMIN_OR_SUPERADMIN_JWT>`, `Content-Type: application/json`
-* **Request Body:**
-  ```json
-  {
-    "anti_sniping_trigger_seconds": 20,
-    "anti_sniping_extension_seconds": 45,
-    "anti_sniping_max_extension_cap_seconds": 600
-  }
-  ```
-* **Response 200 OK:**
-  ```json
-  {
-    "success": true,
-    "data": {
-      "anti_sniping_trigger_seconds": 20,
-      "anti_sniping_extension_seconds": 45,
-      "anti_sniping_max_extension_cap_seconds": 600,
-      "updated_at": "2026-10-24T12:35:00.000Z"
-    },
-    "timestamp": "2026-10-24T12:35:00.000Z"
   }
   ```
 

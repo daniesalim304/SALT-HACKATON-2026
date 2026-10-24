@@ -14,42 +14,50 @@
 
 ## 1. Sequence Diagram: Arsitektur Dual-Login (NIRO SSO vs Superadmin Internal)
 
-### 1.1 Jalur 1: Login with NIRO (Khusus Peserta Lelang / Bidder)
-Peserta lelang cukup menekan satu tombol tanpa perlu registrasi atau membuat password baru di sistem lelang.
+### 1.1 Jalur 1: Login with NIRO (Khusus Peserta Lelang / Bidder & Auction Manager)
+Alur otentikasi lengkap: FE meminta URL redirect ke BE $\rightarrow$ FE membuka halaman NIRO $\rightarrow$ Pengguna login di NIRO $\rightarrow$ FE menerima token NIRO $\rightarrow$ FE mengirim token ke BE $\rightarrow$ BE cek apakah user sudah ada (jika belum didaftarkan, jika sudah diloginkan).
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Bidder as Peserta Lelang (Bidder)
-    participant UI as Next.js Web App
+    actor User as Peserta Lelang (Bidder / AM)
+    participant FE as Next.js Client (Frontend)
+    participant BE as Golang Auth Service (Backend)
     participant NiroAuth as Sistem Autentikasi NIRO (SSO)
-    participant API as Golang Auth Service
     participant DB as PostgreSQL Database
 
-    Bidder->>UI: Klik tombol "Masuk dengan NIRO"
-    UI->>NiroAuth: Buka dialog / Redirect SSO NIRO
-    Bidder->>NiroAuth: Konfirmasi login di akun NIRO
-    NiroAuth-->>UI: Kembalikan valid niro_token
+    User->>FE: Klik tombol "Masuk dengan NIRO"
+    FE->>BE: GET /api/v1/auth/niro/authorize-url
+    BE-->>FE: 200 OK {redirect_url: "https://auth.niro.internal/...", state: "..."}
     
-    UI->>API: POST /api/v1/auth/login-niro {niro_token}
-    API->>NiroAuth: Verifikasi keabsahan token & ambil profil user
-    NiroAuth-->>API: Profil NIRO {niro_user_id, username, email}
-    
-    API->>DB: SELECT * FROM users WHERE niro_user_id = $1
-    alt Pengguna Baru Pertama Kali Masuk via NIRO
-        rect rgb(240, 248, 255)
-            Note over API,DB: Otomatis Buat Akun & Inisialisasi Dompet
-            API->>DB: INSERT INTO users (auth_provider='NIRO', role='BIDDER', niro_user_id, username, email)
-            API->>DB: INSERT INTO wallets (user_id, available_balance=0, reserved_minimum_balance=50000)
-            API->>DB: INSERT INTO ledger_entries (type='INITIAL_MINIMUM_RESERVE', amount=50000)
-        end
-    else Pengguna Sudah Terdaftar
-        DB-->>API: Record user ditemukan (Cek role: BIDDER atau ADMIN)
-    end
+    FE->>NiroAuth: Buka/Arahkan ke redirect_url NIRO
+    User->>NiroAuth: Masukkan kredensial NIRO & selesaikan 2-step verification
+    NiroAuth-->>FE: Kembalikan niro_token (via callback redirect)
 
-    API->>API: Terbitkan JWT Sesi (Claims: user_id, role, provider='NIRO')
-    API-->>UI: 200 OK {token, user_profile, wallet_summary}
-    UI-->>Bidder: Masuk ke halaman lelang & tampilkan saldo
+    FE->>BE: POST /api/v1/auth/login/niro {niro_token}
+    BE->>NiroAuth: Validasi token & ambil data profil
+    NiroAuth-->>BE: Profil Terverifikasi {niro_user_id, username, email}
+
+    BE->>DB: SELECT * FROM users WHERE niro_user_id = $1
+    alt Pengguna Belum Terdaftar (User Baru)
+        rect rgb(240, 248, 255)
+            Note over BE,DB: Otomatis Daftarkan Akun Baru & Buat Dompet
+            BE->>DB: INSERT INTO users (auth_provider='NIRO', role='BIDDER', niro_user_id, username, email)
+            BE->>DB: INSERT INTO wallets (user_id, available_balance=0, locked_balance=0)
+        end
+        BE->>BE: Terbitkan JWT Sesi (Role: 'BIDDER')
+        BE-->>FE: 201 Created {is_new_user: true, token, user, wallet}
+        FE-->>User: Masuk ke Workspace Bidder (Status: Pengguna Baru Terdaftar)
+    else Pengguna Sudah Terdaftar (User Lama)
+        DB-->>BE: Data user ditemukan (Ambil role terkini: BIDDER atau ADMIN)
+        BE->>BE: Terbitkan JWT Sesi (Sesuai Role Terkini)
+        BE-->>FE: 200 OK {is_new_user: false, token, user, wallet}
+        alt Role == 'ADMIN'
+            FE-->>User: Arahkan langsung ke Auction Manager Console
+        else Role == 'BIDDER'
+            FE-->>User: Arahkan ke Bidder Workspace (Katalog Lelang)
+        end
+    end
 ```
 
 ---

@@ -200,7 +200,8 @@ CREATE TABLE auctions (
     condition_grade VARCHAR(50) NOT NULL DEFAULT 'MINT', -- Kondisi: MINT, LIKE_NEW, EXCELLENT
     authenticity_guarantee VARCHAR(255) NOT NULL, -- Nomor Sertifikat Keaslian / Kelengkapan Dokumen
     description TEXT NOT NULL,
-    image_url VARCHAR(255) NOT NULL,
+    image_data BYTEA NOT NULL, -- Disimpan sebagai binary BLOB di DB; saat di-return dikonversi menjadi Base64 Compressed string
+    image_mime_type VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
     model_type auction_model NOT NULL DEFAULT 'UNCAPPED',
     status auction_status NOT NULL DEFAULT 'ACTIVE',
     starting_price NUMERIC(15, 2) NOT NULL CHECK (starting_price > 0), -- Open Bid Awal
@@ -208,7 +209,7 @@ CREATE TABLE auctions (
     min_increment NUMERIC(15, 2) NOT NULL CHECK (min_increment > 0),
     allowed_increment_steps JSONB NOT NULL DEFAULT '[10000, 25000, 50000, 100000]'::jsonb, -- Pilihan tombol inkremental resmi
     valuation_ceiling NUMERIC(15, 2) NULL, -- Harga Maksimal (Buyout Ceiling) - Opsional. Jika ditawar langsung laku!
-    anti_sniping_extension_minutes INT NULL DEFAULT 2, -- Opsi perpanjangan anti-sniping saat ada lonjakan >= 10 hits/detik di 2 menit akhir (dalam Menit)
+    anti_sniping_extension_minutes INT NULL DEFAULT 2, -- Opsi durasi perpanjangan jika terjadi >= 10 hits/detik di 2 menit akhir
     start_time TIMESTAMP WITH TIME ZONE NOT NULL,
     end_time TIMESTAMP WITH TIME ZONE NOT NULL,
     original_end_time TIMESTAMP WITH TIME ZONE NOT NULL,

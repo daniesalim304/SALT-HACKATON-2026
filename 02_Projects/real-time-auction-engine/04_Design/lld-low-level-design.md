@@ -88,7 +88,8 @@ type Auction struct {
 	ConditionGrade         string        `json:"condition_grade"`
 	AuthenticityGuarantee  string        `json:"authenticity_guarantee"`
 	Description            string        `json:"description"`
-	ImageURL               string        `json:"image_url"`
+	ImageData              []byte        `json:"-"` // Binary BLOB di DB
+	ImageBase64Compressed  string        `json:"image_base64_compressed"` // Hasil decode Base64 Compressed saat di-return
 	ModelType              AuctionModel  `json:"model_type"`
 	Status                 AuctionStatus `json:"status"`
 	StartingPrice          float64       `json:"starting_price"`
