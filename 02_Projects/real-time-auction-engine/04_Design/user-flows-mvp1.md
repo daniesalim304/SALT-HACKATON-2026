@@ -121,10 +121,10 @@ flowchart TD
     Start(["Pengguna Buka Halaman Katalog"]) --> FetchREST["GET /api/v1/auctions/active (Ambil Snapshot Lot)"]
     FetchREST --> RenderCards["Render Kartu Lot Lelang:\n- Gambar & Judul Aset\n- Badge (Capped / Uncapped)\n- Current Valuation\n- Countdown Timer"]
     
-    RenderCards --> ConnectWS["Hubungkan ke WebSocket Stream:\nws://host/api/v1/ws/auctions"]
+    RenderCards --> ConnectSSE["Buka Koneksi SSE Stream:\nGET /api/v1/sse/catalog"]
     ConnectWS --> SubTopic["Subscribe Channel 'auctions:active'"]
     
-    SubTopic --> ListenEvents{"Mendengarkan Event WS"}
+    SubTopic --> ListenEvents{"Mendengarkan Event SSE"}
     
     ListenEvents -->|Event: PRICE_UPDATED| UpdatePrice["Animasi Flash Hijau & Update Angka Harga Terkini"]
     ListenEvents -->|Event: TIME_EXTENDED| UpdateTimer["Animasi Jam & Tambah Sisa Detik Countdown"]
@@ -142,7 +142,7 @@ flowchart TD
 | Langkah | Aksi Pengguna | Respon Sistem | Penanganan Error / Validasi |
 |---|---|---|---|
 | **1. Initial Fetch** | Mengakses URL `/auctions`. | Mengambil daftar lot berstatus `ACTIVE` dari endpoint REST. | Tampilkan skeleton loader selama data diunduh. |
-| **2. WebSocket Handshake** | - | Browser membuka koneksi WebSocket persisten ke Golang backend. | Jika WS putus, lakukan auto-reconnect dengan *exponential backoff*. |
+| **2. SSE Connection Handshake** | - | Browser membuka koneksi Server-Sent Events (SSE) persisten via EventSource ke Golang backend (`/api/v1/sse/catalog`). | Jika koneksi putus, browser native EventSource otomatis reconnect dengan header Last-Event-ID. |
 | **3. Live Sync** | Mengamati kartu lot. | State harga dan timer di layar terupdate otomatis begitu event diterima dari server (<300 ms). | Hitung mundur sinkron dengan jam server, bukan jam lokal laptop user. |
 
 ---
@@ -257,9 +257,9 @@ flowchart TD
     
     CheckConfig -->|Ada Setting Extension| TriggerExtend["1. Perpanjang Waktu Akhir:\nEnd Time = End Time + (Extension Minutes * 60 Detik)\n2. Reset Counter Velocity\n3. Update Sorted Set Expiration di Redis"]
     
-    TriggerExtend --> BroadcastWS["Broadcast WebSocket Event: TIME_EXTENDED\n{lot_id, new_end_time, extension_minutes}"]
+    TriggerExtend --> BroadcastSSE["Broadcast SSE Event: TIME_EXTENDED\n{lot_id, new_end_time, extension_minutes}"]
     
-    BroadcastWS --> ClientUpdate["Seluruh Tampilan Peserta Memperbarui Jam Hitung Mundur\n& Muncul Lencana: 'Anti-Sniping Aktif (+X Menit)'"]
+    BroadcastSSE --> ClientUpdate["Seluruh Tampilan Peserta Memperbarui Jam Hitung Mundur\n& Muncul Lencana: 'Anti-Sniping Aktif (+X Menit)'"]
     
     NormalRecord --> End(["Selesai"])
     ClientUpdate --> End

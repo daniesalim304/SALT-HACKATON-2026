@@ -33,7 +33,7 @@
 | 0.1 | 24 Oct 2026 | Daniel H. S. | Initial Technical Draft (Components & Goroutines) |
 | 0.5 | 24 Oct 2026 | Daniel H. S. | Added Lua Scripting Logic, Settlement Daemon, and 14 API Endpoints |
 | 1.0 | 24 Oct 2026 | Daniel H. S. | Baseline Alignment with Enterprise Template Structure & Sign-Off |
-| 2.0 | 24 Oct 2026 | Daniel H. S. | **Deep Technical Refinement:** Transisi WebSocket ke Server-Sent Events (SSE HTTP/2), full code Lua atomik, struktur Go struct murni, kontrak teknis 14 API dengan standar envelope BE (`success`/`error`), dan manajemen auto-logout JWT versi Redis. |
+| 2.0 | 24 Oct 2026 | Daniel H. S. | **Deep Technical Refinement:** Spesifikasi Server-Sent Events (SSE HTTP/2), full code Lua atomik, struktur Go struct murni, kontrak teknis 14 API dengan standar envelope BE (`success`/`error`), dan manajemen auto-logout JWT versi Redis. |
 
 ---
 
@@ -78,7 +78,7 @@ Platform dibangun menggunakan arsitektur enterprise modern dengan standar perfor
 * **Backend Runtime:** Go (Golang) v1.22+ menggunakan router berperforma tinggi (`Chi` / `Gin`) dengan concurrency berbasis Goroutine dan Channels.
 * **In-Memory Cache & Mutex:** Redis v7.2 Cluster (Replication Mode) dengan *Lua Engine* untuk eksekusi atomik hot-path penawaran lelang (< 5 ms execution time) dan Pub/Sub message broker.
 * **Authoritative Database:** PostgreSQL v16 dengan konfigurasi ACID transaction level `SERIALIZABLE` untuk mutasi saldo e-wallet dan double-entry ledger.
-* **Real-Time Streaming:** **Server-Sent Events (SSE)** berjalan di atas **HTTP/2** persisten (`text/event-stream`), ramah terhadap enterprise firewall, proxy WAF, dan hemat bandwidth dibandingkan WebSocket konvensional.
+* **Real-Time Streaming:** **Server-Sent Events (SSE)** berjalan di atas **HTTP/2** persisten (`text/event-stream`), ramah terhadap enterprise firewall, proxy WAF, dan hemat bandwidth dengan latensi siaran < 300 ms.
 * **Identity & Authentication:** Dual-method Authentication: NIRO OAuth2 SSO untuk `BIDDER` & `ADMIN` (Auction Manager), serta Email & Password dengan PBKDF2/Argon2id dan Progressive Lockout untuk `SUPERADMIN`.
 * **Image Storage Engine:** Kolom PostgreSQL `BYTEA` (Binary Large Object) yang disimpan langsung di database tanpa ketergantungan storage S3 pihak ketiga, di-serve ke frontend sebagai string terkompresi Base64.
 * **Frontend Web Application:** Next.js v14+ (React 18, TypeScript, Tailwind CSS) dengan modul HTML5 `EventSource` untuk konsumsi stream SSE lelang.
@@ -412,7 +412,7 @@ Seluruh 14 endpoint implementasi transport API pada sistem dirancang dengan stan
 
 ### 6.2 Server-Sent Events (SSE) Protocol & Broadcast Hub
 
-Sistem secara ketat menggunakan **Server-Sent Events (SSE)** sebagai pengganti WebSocket untuk penyiaran data real-time:
+Sistem secara ketat menggunakan **Server-Sent Events (SSE)** berbasis HTTP/2 persisten untuk penyiaran data real-time:
 
 * **Header HTTP Server:**
   ```http

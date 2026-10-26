@@ -1,19 +1,19 @@
-# Koleksi Kontrak API Lengkap (API Contract Collection)
+# Complete API Contract Collection & Event Schemas
 
-| Metadata | Nilai |
+| Metadata | Value |
 |---|---|
-| **Dokumen** | Complete API Contract Collection & Response Schemas |
-| **Proyek** | Real-Time Auction & Bidding Engine (Fintech / E-Commerce) |
-| **Versi** | v1.0.0 |
+| **Document** | Complete API Contract Collection & Response Schemas |
+| **Project** | Real-Time Luxury Auction & Bidding Engine |
+| **Version** | v2.0.0 (Corporate Baseline) |
 | **Status** | `Approved Baseline` |
-| **Tanggal** | 2026-10-24 |
+| **Date** | 24 October 2026 |
 | **Base URL** | `http://localhost:8080/api/v1` |
 
 ---
 
-## 1. Standar Format Respon Global
+## 1. Global Response Standards
 
-### Respon Sukses (HTTP 200 / 201)
+### Success Response Envelope (HTTP 200 / 201)
 ```json
 {
   "status": "success",
@@ -21,712 +21,667 @@
 }
 ```
 
-### Respon Gagal (HTTP 400 / 401 / 403 / 404 / 409 / 500)
+### Error Response Envelope (HTTP 4xx / 5xx)
 ```json
 {
   "status": "error",
   "error": {
     "code": "ERROR_CODE_STRING",
-    "message": "Pesan deskripsi kesalahan dalam bahasa Indonesia."
+    "message": "Descriptive error message in English."
   }
 }
 ```
 
 ---
 
-## 2. Koleksi Endpoint Lengkap Beserta Seluruh Respon
+## 2. Complete Endpoint Specifications
 
-### MODUL 1: AUTENTIKASI DUAL-LOGIN & RBAC
+### MODULE 1: DUAL-METHOD AUTHENTICATION & RBAC
 
 #### 1. `GET /auth/niro/authorize-url`
-Frontend (Next.js) memanggil endpoint ini ketika pengguna mengklik tombol *"Login with NIRO"*. Endpoint ini mengembalikan URL redirect otorisasi SSO NIRO beserta state parameter untuk keamanan CSRF.
+The client application invokes this endpoint when a user clicks the *"Login with NIRO"* action. It returns the official NIRO OAuth2 authorization URL alongside a CSRF protection state parameter.
 
 * **Headers:** *None*
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "redirect_url": "https://auth.niro.internal/oauth2/authorize?client_id=salt_auction_web&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&state=sec_state_981247",
-      "state": "sec_state_981247"
-    }
+```json
+{
+  "status": "success",
+  "data": {
+    "redirect_url": "https://auth.niro.internal/oauth2/authorize?client_id=salt_auction_web&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fcallback&state=sec_state_981247",
+    "state": "sec_state_981247"
   }
-  ```
+}
+```
 
 ---
 
 #### 2. `POST /auth/login/niro`
-Setelah Frontend membuka URL redirect NIRO, pengguna berhasil login di sistem NIRO dan FE mendapatkan token/kode NIRO. Frontend kemudian mengirimkan token NIRO tersebut ke Backend melalui endpoint ini.
+After the user authenticates with NIRO and the client receives the callback authorization token, the client exchanges the token via this endpoint.
 
-**Logika Pemeriksaan Akun di Backend:**
-- Backend memvalidasi token ke server NIRO dan mengekstrak identitas (`niro_user_id`, `email`, `username`).
-- Backend memeriksa tabel `users` berdasarkan `niro_user_id`:
-  - **Jika Belum Terdaftar:** Sistem secara otomatis **mendaftarkan akun baru** (`auth_provider = 'NIRO'`, role default `BIDDER`), membuatkan akun dompet (`available_balance = 0`, `locked_balance = 0`), dan menerbitkan token JWT sesi. Respon mengembalikan status `is_new_user: true` (HTTP 201).
-  - **Jika Sudah Terdaftar:** Sistem langsung **meloginkan pengguna**, memuat role terkini (`BIDDER` atau `ADMIN` jika sudah dipromosikan), dan menerbitkan token JWT sesi. Respon mengembalikan status `is_new_user: false` (HTTP 200).
+**Backend Account Resolution Logic:**
+- Validates token against NIRO IdP and extracts user identity (`niro_user_id`, `email`, `username`).
+- Inspects the `users` table:
+  - **New User:** Automatically registers account (`auth_provider = 'NIRO'`, default role `BIDDER`), provisions an e-wallet (`available_balance = 0.00`, `locked_balance = 0.00`), and issues a JWT session. Returns `is_new_user: true` (HTTP 201).
+  - **Existing User:** Authenticates user immediately, loads latest role (`BIDDER` or `ADMIN` if promoted), and issues a JWT session. Returns `is_new_user: false` (HTTP 200).
 
 * **Headers:** `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "niro_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.niro_sample_token..."
-  }
-  ```
-* **Response 200 OK (Pengguna Sudah Terdaftar — Berhasil Loginkan):**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "is_new_user": false,
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
-      "user": {
-        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-        "niro_user_id": "NIRO-USR-99812",
-        "username": "budi_kolektor",
-        "email": "budi@collector.id",
-        "auth_provider": "NIRO",
-        "role": "BIDDER"
-      },
-      "wallet": {
-        "available_balance": 150000000.00,
-        "locked_balance": 0.00,
-        "total_balance": 150000000.00
-      }
+```json
+{
+  "niro_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.niro_sample_token..."
+}
+```
+
+* **Response 200 OK (Existing Registered User Authenticated):**
+```json
+{
+  "status": "success",
+  "data": {
+    "is_new_user": false,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
+    "user": {
+      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "niro_user_id": "NIRO-USR-99812",
+      "username": "budi_collector",
+      "email": "budi@collector.id",
+      "auth_provider": "NIRO",
+      "role": "BIDDER"
+    },
+    "wallet": {
+      "available_balance": 150000000.00,
+      "locked_balance": 0.00,
+      "total_balance": 150000000.00
     }
   }
-  ```
-* **Response 201 Created (Pengguna Belum Terdaftar — Berhasil Didaftarkan Otomatis):**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "is_new_user": true,
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
-      "user": {
-        "id": "7ca12345-5717-4562-b3fc-2c963f66bbbb",
-        "niro_user_id": "NIRO-USR-10293",
-        "username": "siti_investor",
-        "email": "siti@luxury.com",
-        "auth_provider": "NIRO",
-        "role": "BIDDER"
-      },
-      "wallet": {
-        "available_balance": 0.00,
-        "locked_balance": 0.00,
-        "total_balance": 0.00
-      }
+}
+```
+
+* **Response 201 Created (New User Auto-Provisioned):**
+```json
+{
+  "status": "success",
+  "data": {
+    "is_new_user": true,
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.auction_jwt_token...",
+    "user": {
+      "id": "7ca12345-5717-4562-b3fc-2c963f66bbbb",
+      "niro_user_id": "NIRO-USR-10293",
+      "username": "siti_investor",
+      "email": "siti@luxury.com",
+      "auth_provider": "NIRO",
+      "role": "BIDDER"
+    },
+    "wallet": {
+      "available_balance": 0.00,
+      "locked_balance": 0.00,
+      "total_balance": 0.00
     }
   }
-  ```
-* **Response 401 Unauthorized (Token NIRO Invalid/Expired):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_INVALID_NIRO_TOKEN",
-      "message": "Token otentikasi NIRO tidak valid atau telah kedaluwarsa."
-    }
+}
+```
+
+* **Response 401 Unauthorized (Invalid or Expired NIRO Token):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_INVALID_NIRO_TOKEN",
+    "message": "The provided NIRO authentication token is invalid or expired."
   }
-  ```
+}
+```
 
 ---
 
 #### 3. `POST /auth/login/email`
-Login terisolasi khusus Superadmin platform lelang menggunakan Email dan Password internal (minimal 12 karakter), dilengkapi proteksi penguncian bertingkat (*Progressive Lockout*).
-
-*Aturan Kebijakan Gagal Login (Lockout):*
-- 3x salah pertama: Terkunci **1 menit**.
-- 3x salah kedua (total 6x): Terkunci **2 menit** (dobel waktu).
-- 3x salah ketiga (total 9x): Terkunci **1 jam (60 menit)**.
-- Catatan: Fitur *Forgot Password* dan *Kickout* ditiadakan.
+Dedicated authentication endpoint strictly reserved for platform Super Admins using email and password (minimum 12 characters). Protected by Redis progressive lockout:
+- 1st streak (3 failed attempts): 1-minute lockout (HTTP 429)
+- 2nd streak (3 failed attempts): 2-minute lockout (HTTP 429)
+- 3rd streak (3 failed attempts): 1-hour lockout (HTTP 429)
 
 * **Headers:** `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "email": "superadmin@salt-auction.internal",
-    "password": "MasterAdminSalt2026!"
-  }
-  ```
-* **Response 200 OK (Login Berhasil):**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.superadmin_jwt...",
-      "user": {
-        "id": "00000000-0000-0000-0000-000000000001",
-        "username": "superadmin",
-        "email": "superadmin@salt-auction.internal",
-        "auth_provider": "INTERNAL",
-        "role": "SUPERADMIN"
-      }
+```json
+{
+  "email": "superadmin@salt.id",
+  "password": "SuperSecurePassword2026!"
+}
+```
+
+* **Response 200 OK (Super Admin Authenticated):**
+```json
+{
+  "status": "success",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.superadmin_jwt...",
+    "user": {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "username": "superadmin_core",
+      "email": "superadmin@salt.id",
+      "auth_provider": "LOCAL",
+      "role": "SUPERADMIN"
     }
   }
-  ```
-* **Response 401 Unauthorized (Kredensial Salah):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_INVALID_CREDENTIALS",
-      "message": "Email atau kata sandi salah.",
-      "details": {
-        "remaining_attempts_before_lock": 2
-      }
-    }
+}
+```
+
+* **Response 400 Bad Request (Password Less Than 12 Characters):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_PASSWORD_TOO_SHORT",
+    "message": "Super Admin password must contain a minimum of 12 characters."
   }
-  ```
-* **Response 429 Too Many Requests (Akun Terkunci Sementara - Lockout):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_ACCOUNT_TEMPORARILY_LOCKED",
-      "message": "Terlalu banyak percobaan login gagal berturut-turut. Akun Anda dikunci sementara selama 60 detik. Silakan coba lagi nanti.",
-      "details": {
-        "retry_after_seconds": 60,
-        "lockout_level": 1
-      }
-    }
+}
+```
+
+* **Response 403 Forbidden (Non-Super Admin Access Rejection):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_NON_SUPERADMIN_LOGIN",
+    "message": "Please use Login with NIRO for your account type."
   }
-  ```
+}
+```
+
+* **Response 429 Too Many Requests (Progressive Lockout Triggered):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_ACCOUNT_LOCKED_PROGRESSIVE",
+    "message": "Too many consecutive failed login attempts. Account temporarily locked.",
+    "retry_after_seconds": 60
+  }
+}
+```
 
 ---
 
-#### 3. `GET /admin/users`
-Mengambil daftar pengguna login NIRO untuk dikelola oleh Superadmin.
+#### 4. `GET /admin/users`
+Returns the directory of registered platform users with pagination metadata. Restricted to Super Admin.
 
 * **Headers:** `Authorization: Bearer <SUPERADMIN_JWT>`
-* **Query Params:** `?page=1&limit=10&role=BIDDER`
+* **Query Parameters:** `?page=1&limit=10`
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "users": [
-        {
-          "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-          "niro_user_id": "NIRO-USR-99812",
-          "username": "budi_kolektor",
-          "email": "budi@collector.id",
-          "auth_provider": "NIRO",
-          "role": "BIDDER",
-          "created_at": "2026-10-24T10:00:00.000Z"
-        }
-      ],
-      "pagination": {
-        "page": 1,
-        "limit": 10,
-        "total_items": 1,
-        "total_pages": 1
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
+        "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "niro_user_id": "NIRO-USR-99812",
+        "username": "budi_collector",
+        "email": "budi@collector.id",
+        "role": "BIDDER",
+        "created_at": "2026-10-24T08:00:00Z"
       }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 10,
+      "total_items": 42,
+      "total_pages": 5
     }
   }
-  ```
-* **Response 403 Forbidden:**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_FORBIDDEN_ACCESS",
-      "message": "Akses ditolak. Endpoint ini hanya dapat diakses oleh Superadmin."
-    }
-  }
-  ```
+}
+```
 
 ---
 
-#### 4. `PATCH /admin/users/{id}/role`
-Superadmin mempromosikan pengguna login NIRO menjadi **ADMIN** (Auction Manager).
+#### 5. `PATCH /admin/users/:id/role`
+Promotes a registered user from `BIDDER` to `ADMIN` (Auction Manager). The backend increments `token_version:{user_id}` in Redis to instantly revoke active JWT sessions (**Instant Auto-Logout**).
 
 * **Headers:** `Authorization: Bearer <SUPERADMIN_JWT>`, `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "role": "ADMIN"
-  }
-  ```
+```json
+{
+  "new_role": "ADMIN"
+}
+```
+
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "username": "budi_kolektor",
-      "previous_role": "BIDDER",
-      "new_role": "ADMIN",
-      "updated_at": "2026-10-24T12:05:00.000Z"
-    }
+```json
+{
+  "status": "success",
+  "data": {
+    "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "username": "budi_collector",
+    "old_role": "BIDDER",
+    "new_role": "ADMIN",
+    "session_revoked": true,
+    "updated_at": "2026-10-24T10:15:00Z"
   }
-  ```
-* **Response 404 Not Found:**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_USER_NOT_FOUND",
-      "message": "Pengguna dengan ID tersebut tidak ditemukan."
-    }
+}
+```
+
+* **Response 401 Unauthorized (Client Access with Revoked Session Token):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "AUTH_TOKEN_REVOKED",
+    "message": "Your user role has been updated. Please log in again to continue."
   }
-  ```
+}
+```
 
 ---
 
-### MODUL 2: DOMPET LIKUIDITAS & TOP-UP SALDO
+### MODULE 2: E-WALLET & COLLATERAL MANAGEMENT
 
-#### 5. `GET /wallet/me`
-Mengambil informasi saldo pengguna saat ini.
+#### 6. `GET /wallet/me`
+Retrieves liquid available balance and locked collateral balance. Moneter values are serialized as `float64`. Restricted to `BIDDER`.
 
-* **Headers:** `Authorization: Bearer <JWT_TOKEN>`
+* **Headers:** `Authorization: Bearer <BIDDER_JWT>`
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-      "available_balance": 25000000.00,
-      "locked_balance": 75000000.00,
-      "total_balance": 100000000.00
-    }
+```json
+{
+  "status": "success",
+  "data": {
+    "wallet_id": "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d",
+    "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "available_balance": 150000000.00,
+    "locked_balance": 25000000.00,
+    "total_balance": 175000000.00,
+    "currency": "IDR"
   }
-  ```
+}
+```
 
 ---
 
-#### 6. `POST /wallet/topup`
-Menambahkan saldo bebas (*Available Balance*) untuk modal bidding (*Role BIDDER Required*).
-Sesuai aturan bisnis **US-001**, **hanya Bidder yang dapat melakukan top-up**, dan nominal minimal pengisian adalah **Rp 100.000**.
+#### 7. `POST /wallet/topup`
+Deposits funds into the bidder's e-wallet (minimum IDR 100,000, whole rupiah multiples). Non-bidder roles are strictly prohibited (HTTP 403).
 
 * **Headers:** `Authorization: Bearer <BIDDER_JWT>`, `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "amount": 50000000.00
-  }
-  ```
+```json
+{
+  "amount": 50000000.00
+}
+```
+
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "topup_amount": 50000000.00,
-      "previous_available_balance": 25000000.00,
-      "new_available_balance": 75000000.00,
-      "locked_balance": 75000000.00,
-      "total_balance": 150000000.00
-    }
+```json
+{
+  "status": "success",
+  "data": {
+    "transaction_id": "tx_topup_8871263",
+    "entry_type": "WALLET_TOPUP",
+    "amount_credited": 50000000.00,
+    "new_available_balance": 200000000.00,
+    "new_locked_balance": 25000000.00,
+    "new_total_balance": 225000000.00,
+    "created_at": "2026-10-24T10:30:00Z"
   }
-  ```
-* **Response 400 Bad Request (Nominal di Bawah Minimal Rp 100.000):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_MINIMUM_TOPUP_AMOUNT",
-      "message": "Minimum top up is IDR 100,000.",
-      "details": {
-        "minimum_required": 100000.00
-      }
-    }
+}
+```
+
+* **Response 400 Bad Request (Amount Below Minimum Threshold):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_TOPUP_AMOUNT_TOO_LOW",
+    "message": "Minimum top-up amount is IDR 100,000 in whole rupiah multiples."
   }
-  ```
-* **Response 403 Forbidden (Bukan Bidder):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_FORBIDDEN_ROLE",
-      "message": "Akses ditolak. Fitur dompet dan top-up hanya dapat diakses oleh peran Bidder."
-    }
+}
+```
+
+* **Response 403 Forbidden (Non-Bidder Access Attempt):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_TOPUP_RESTRICTED",
+    "message": "Wallet top-up is exclusive to Bidder accounts."
   }
-  ```
-      "locked_balance": 75000000.00,
-      "total_balance": 150000000.00
-    }
-  }
-  ```
-* **Response 400 Bad Request:**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_INVALID_TOPUP_AMOUNT",
-      "message": "Nominal top-up harus berupa angka positif lebih dari nol."
-    }
-  }
-  ```
+}
+```
 
 ---
 
-### MODUL 3: KATALOG LELANG BARANG MEWAH
+### MODULE 3: MARKETPLACE & PRODUCT CATALOG
 
-#### 7. `GET /auctions/active`
-Mengambil daftar snapshot seluruh lot barang bernilai tinggi yang sedang aktif di pasar, mendukung pagination.
-Gambar aset di-return dalam format **Base64 Compressed String** (hasil decode dari binary BLOB di DB).
+#### 8. `GET /auctions/active`
+Retrieves catalog snapshot of active luxury items with pagination metadata. Product images are served as compressed Base64 strings decoded from database `BYTEA` BLOBs.
 
-* **Query Params:** `?page=1&limit=10&category=LUXURY_WATCHES`
+* **Query Parameters:** `?page=1&limit=10&category=LUXURY_WATCHES`
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "auctions": [
-        {
-          "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-          "title": "Cosmograph Chronograph Steel 2023",
-          "category": "LUXURY_WATCHES",
-          "condition_grade": "MINT",
-          "authenticity_guarantee": "Full Set 2023, Box & Papers",
-          "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
-          "model_type": "CAPPED",
-          "status": "ACTIVE",
-          "starting_price": 350000000.00,
-          "current_price": 380000000.00,
-          "min_increment": 5000000.00,
-          "allowed_increment_steps": [5000000.00, 10000000.00, 25000000.00],
-          "valuation_ceiling": 500000000.00,
-          "highest_bidder_username": "andi_collector",
-          "end_time": "2026-10-25T12:00:00.000Z"
-        }
-      ],
-      "pagination": {
-        "page": 1,
-        "limit": 10,
-        "total_items": 1,
-        "total_pages": 1
-      }
-    }
-  }
-  ```
-
----
-
-#### 8. `GET /auctions/{id}`
-Mengambil detail spesifikasi satu lot barang bernilai tinggi beserta riwayat penawaran terakhir.
-
-* **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "lot": {
+```json
+{
+  "status": "success",
+  "data": {
+    "items": [
+      {
         "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-        "title": "Cosmograph Chronograph Steel 2023",
+        "title": "Rolex Submariner Date 126610LN Oystersteel",
         "category": "LUXURY_WATCHES",
-        "condition_grade": "MINT",
+        "condition_grade": "PRISTINE_MINT",
         "authenticity_guarantee": "Full Set 2023, Box & Papers",
-        "description": "White dial, pristine condition, unworn.",
-        "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
+        "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
         "model_type": "CAPPED",
         "status": "ACTIVE",
-        "starting_price": 350000000.00,
-        "current_price": 380000000.00,
-        "allowed_increment_steps": [5000000.00, 10000000.00, 25000000.00],
-        "valuation_ceiling": 500000000.00,
-        "highest_bidder_id": "8bb30e92-3a52-47d1-ba76-218f2d5f22e1",
-        "highest_bidder_username": "andi_collector",
-        "start_time": "2026-10-24T12:00:00.000Z",
-        "end_time": "2026-10-25T12:00:00.000Z"
-      },
-      "recent_bids": [
-        {
-          "bid_id": "7fa12345-872b-42e7-91a6-f7615cb38421",
-          "bidder_username": "andi_collector",
-          "amount": 380000000.00,
-          "created_at": "2026-10-24T12:15:30.000Z"
-        }
-      ]
+        "min_price": 200000000.00,
+        "current_price": 350000000.00,
+        "max_price": 500000000.00,
+        "start_time": "2026-10-24T00:00:00Z",
+        "end_time": "2026-10-25T12:00:00Z",
+        "total_bids": 18
+      }
+    ],
+    "pagination": {
+      "current_page": 1,
+      "per_page": 10,
+      "total_items": 1,
+      "total_pages": 1
     }
   }
-  ```
-* **Response 404 Not Found:**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_AUCTION_NOT_FOUND",
-      "message": "Lot lelang dengan ID tersebut tidak ditemukan."
-    }
-  }
-  ```
+}
+```
 
 ---
 
-### MODUL 4: PENAWARAN INKREMENTAL & SALDO TERTAHAN (HOT-PATH)
+#### 9. `GET /auctions/:id`
+Retrieves granular specifications, certificate details, allowed discrete increment buttons array, and real-time room status.
 
-#### 9. `POST /auctions/{id}/bids`
-Mengajukan tawaran lelang dengan memilih tombol inkremental resmi (atau menawar langsung nilai ceiling).
-Sistem secara otomatis mengevaluasi:
-- Jika `current_price + increment_amount >= valuation_ceiling`, lelang **LANGSUNG LAKU (*Instant Buyout*)** seketika tanpa perlu flag manual.
+* **Path Parameters:** `:id` (UUID)
+* **Response 200 OK:**
+```json
+{
+  "status": "success",
+  "data": {
+    "id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+    "title": "Rolex Submariner Date 126610LN Oystersteel",
+    "category": "LUXURY_WATCHES",
+    "condition_grade": "PRISTINE_MINT",
+    "authenticity_guarantee": "Full Set 2023, Certified Official Escrow",
+    "description": "Black cerachrom ceramic bezel, 41mm case, complete box & papers.",
+    "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+    "model_type": "CAPPED",
+    "status": "ACTIVE",
+    "min_price": 200000000.00,
+    "current_price": 350000000.00,
+    "allowed_increment_steps": [
+      5000000.00,
+      10000000.00,
+      20000000.00
+    ],
+    "max_price": 500000000.00,
+    "highest_bidder_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "highest_bidder_masked": "Bu***or",
+    "start_time": "2026-10-24T00:00:00Z",
+    "end_time": "2026-10-25T12:00:00Z",
+    "anti_sniping_extension_minutes": 2,
+    "total_bids": 18
+  }
+}
+```
+
+---
+
+### MODULE 4: REAL-TIME BIDDING CORE ENGINE
+
+#### 10. `POST /auctions/:id/bids`
+Submits an incremental bid via pre-configured discrete increment buttons. Free-text amount entry is prohibited. Executes atomic Redis Lua script (`bid_placement.lua` < 5 ms):
+- Moves funds from `available_balance` to `locked_balance`.
+- Retains previous bidders' funds in `locked_balance` during active auction.
+- If bid hits ceiling in Capped auction $\rightarrow$ instant **Buy-Out** (`CLOSED_AWARDED`).
+- If bid arrives in last 2 minutes and velocity $\ge$ 10 hits/s $\rightarrow$ triggers **Anti-Sniping Extension**.
 
 * **Headers:** `Authorization: Bearer <BIDDER_JWT>`, `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "increment_amount": 10000000.00
+```json
+{
+  "step_increment": 10000000.00
+}
+```
+
+* **Response 200 OK (Bid Accepted):**
+```json
+{
+  "status": "success",
+  "data": {
+    "bid_status": "ACCEPTED",
+    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+    "new_price": 360000000.00,
+    "highest_bidder_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "wallet_available_remaining": 140000000.00,
+    "wallet_collateral_locked": 35000000.00,
+    "anti_sniping_extended": false,
+    "new_end_time": "2026-10-25T12:00:00Z",
+    "created_at": "2026-10-24T11:00:00Z"
   }
-  ```
-* **Response 200 OK (Tawaran Sukses & Memimpin):**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-      "new_current_price": 390000000.00,
-      "bid_status": "WINNING",
-      "wallet_state": {
-        "locked_collateral_for_this_bid": 390000000.00,
-        "remaining_available_balance": 10000000.00,
-        "total_balance": 400000000.00
-      },
-      "time_extended": false,
-      "new_end_time": "2026-10-25T12:00:00.000Z",
-      "buyout_triggered": false
-    }
+}
+```
+
+* **Response 400 Bad Request (Invalid Increment Step):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_INVALID_INCREMENT_STEP",
+    "message": "Bid must match one of the allowed discrete increment steps [5000000, 10000000, 20000000]."
   }
-  ```
-* **Response 200 OK (Mencapai/Melebihi Ceiling — Instant Buyout Terpicu Otomatis):**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-      "new_current_price": 500000000.00,
-      "bid_status": "WINNING",
-      "wallet_state": {
-        "locked_collateral_for_this_bid": 500000000.00,
-        "remaining_available_balance": 50000000.00,
-        "total_balance": 550000000.00
-      },
-      "time_extended": false,
-      "buyout_triggered": true,
-      "auction_status": "CLOSED_AWARDED"
-    }
+}
+```
+
+* **Response 400 Bad Request (Insufficient Liquid Balance):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_INSUFFICIENT_AVAILABLE_BALANCE",
+    "message": "Your available balance is insufficient to place this bid."
   }
-  ```
-* **Response 400 Bad Request (Saldo Kurang):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_INSUFFICIENT_AVAILABLE_BALANCE",
-      "message": "Saldo bebas Anda (Rp 25.000.000) tidak mencukupi untuk tawaran sebesar Rp 390.000.000. Silakan lakukan Top-Up."
-    }
-  }
-  ```
-* **Response 400 Bad Request (Lelang Sudah Ditutup):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_AUCTION_NOT_ACTIVE",
-      "message": "Lelang ini telah berakhir atau telah dimenangkan via Buyout."
-    }
-  }
-  ```
+}
+```
 
 ---
 
-### MODUL 5: BOT PENAWARAN OTOMATIS (AUTOMATED PROXY BIDDING)
+### MODULE 5: AUTONOMOUS PROXY BIDDING
 
-#### 10. `POST /auctions/{id}/proxy-bid`
-Mendaftarkan atau memperbarui batas maksimal bot proxy bidding.
+#### 11. `POST /auctions/:id/proxy-bid`
+Configures an autonomous proxy bot to place counter-bids automatically up to a maximum limit (`max_limit`).
 
-* **Headers:** `Authorization: Bearer <JWT_TOKEN>`, `Content-Type: application/json`
+* **Headers:** `Authorization: Bearer <BIDDER_JWT>`, `Content-Type: application/json`
 * **Request Body:**
-  ```json
-  {
-    "max_limit": 450000000.00
-  }
-  ```
+```json
+{
+  "max_limit": 450000000.00
+}
+```
+
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-      "proxy_id": "b1827461-872b-42e7-91a6-f7615cb38421",
-      "max_limit": 450000000.00,
-      "is_active": true,
-      "current_auction_price": 395000000.00,
-      "your_current_bid": 395000000.00,
-      "status": "PROXY_ACTIVE_AND_LEADING"
-    }
+```json
+{
+  "status": "success",
+  "data": {
+    "proxy_rule_id": "prx_9901827",
+    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+    "user_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "max_limit": 450000000.00,
+    "proxy_status": "ACTIVE",
+    "configured_at": "2026-10-24T11:15:00Z"
   }
-  ```
-* **Response 400 Bad Request (Limit Lebih Kecil dari Harga Saat Ini):**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_PROXY_LIMIT_TOO_LOW",
-      "message": "Batas limit proxy harus lebih besar dari penawaran saat ini (Rp 390.000.000)."
-    }
-  }
-  ```
+}
+```
 
 ---
 
-#### 11. `DELETE /auctions/{id}/proxy-bid`
-Membatalkan / menonaktifkan aturan bot proxy bidding aktif.
+#### 12. `DELETE /auctions/:id/proxy-bid`
+Deactivates autonomous proxy bidding on the specified lot.
 
-* **Headers:** `Authorization: Bearer <JWT_TOKEN>`
+* **Headers:** `Authorization: Bearer <BIDDER_JWT>`
 * **Response 200 OK:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "auction_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-      "is_active": false
-    },
-    "message": "Aturan proxy bidding berhasil dinonaktifkan."
+```json
+{
+  "status": "success",
+  "data": {
+    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+    "proxy_status": "CANCELLED",
+    "deactivated_at": "2026-10-24T11:20:00Z"
   }
-  ```
+}
+```
 
 ---
 
-### MODUL 6: MANAJEMEN LOT & KURASI ADMIN
+### MODULE 6: ADMIN LOT CURATION & MANAGEMENT
 
-#### 12. `POST /admin/auctions`
-Admin / Auction Manager membuat listing lelang barang bernilai tinggi baru.
-- Endpoint ini menerima payload dalam format **`multipart/form-data`** karena menyertakan unggahan binary berkas gambar aset (`image`).
-- Gambar binary yang diunggah langsung disimpan di PostgreSQL sebagai **BLOB (`BYTEA`)** dan dikompresi menjadi format Base64 saat dibaca kembali.
-- Pengaturan perpanjangan waktu anti-sniping (`anti_sniping_extension_minutes`) dikonfigurasi langsung pada endpoint ini.
+#### 13. `POST /admin/auctions`
+Auction Manager creates a new luxury auction listing. The binary image file is received via `multipart/form-data` and directly persisted into PostgreSQL as a **`BYTEA` BLOB** without third-party storage dependencies.
 
 * **Headers:** `Authorization: Bearer <ADMIN_JWT>`, `Content-Type: multipart/form-data`
-* **Form Data Fields:**
-  - `title` (text): `"Togo Leather Handbag 25 Gold Hardware"`
+* **Form-Data Fields:**
+  - `title` (text): `"Hermes Birkin 25 Togo Gold Hardware"`
   - `category` (text): `"DESIGNER_BAGS"`
   - `condition_grade` (text): `"MINT"`
   - `authenticity_guarantee` (text): `"Store Receipt 2024, Original Orange Box, Dustbag, CITES cert"`
   - `description` (text): `"Store fresh condition, highly sought-after collector investment piece."`
-  - `image` (binary file): `[File binary gambar JPEG/PNG/WEBP]`
+  - `image` (binary file): `[Binary image payload JPEG/PNG/WEBP]`
   - `min_price` (number): `250000000.00`
   - `allowed_increment_steps` (json string): `"[5000000, 10000000, 20000000]"`
-  - `max_price` (number, opsional): `400000000.00`
+  - `max_price` (number, optional): `400000000.00`
   - `window_duration_seconds` (number): `86400`
-  - `anti_sniping_extension_minutes` (number, opsional): `2`
+  - `anti_sniping_extension_minutes` (number, optional): `2`
+
 * **Response 201 Created:**
-  ```json
-  {
-    "status": "success",
-    "data": {
-      "id": "c1f76d22-192a-4c28-8742-1928374aef12",
-      "title": "Togo Leather Handbag 25 Gold Hardware",
-      "category": "DESIGNER_BAGS",
-      "condition_grade": "MINT",
-      "authenticity_guarantee": "Store Receipt 2024, Original Orange Box, Dustbag, CITES cert",
-      "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBD...",
-      "model_type": "CAPPED",
-      "status": "ACTIVE",
-      "current_price": 250000000.00,
-      "valuation_ceiling": 400000000.00,
-      "anti_sniping_extension_minutes": 2,
-      "start_time": "2026-10-24T12:30:00.000Z",
-      "end_time": "2026-10-25T12:30:00.000Z"
-    }
-  }
-  ```
-* **Response 400 Bad Request:**
-  ```json
-  {
-    "status": "error",
-    "error": {
-      "code": "ERR_INVALID_AUCTION_PARAMS",
-      "message": "Harga maksimal harus bernilai lebih besar daripada harga minimal, dan file gambar wajib dilampirkan."
-    }
-  }
-  ```
-
----
-
-## 3. Spesifikasi Protokol WebSocket Lengkap
-
-* **URL Koneksi:** `ws://localhost:8080/api/v1/ws/auctions`
-* **Handshake Token Query:** `?token=<JWT_TOKEN>` (opsional jika hanya menonton).
-
-### 3.1 Format Frame Masuk (Inbound Frame dari Client ke Server)
-
 ```json
 {
-  "action": "SUBSCRIBE_LOT",
-  "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421"
-}
-```
-
----
-
-### 3.2 Format Frame Siaran Lengkap (Outbound Events dari Server ke Client)
-
-#### 1. Event `PRICE_UPDATED` (Penawaran Baru Sah)
-```json
-{
-  "event": "PRICE_UPDATED",
+  "status": "success",
   "data": {
-    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-    "current_price": 390000000.00,
-    "highest_bidder_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "highest_bidder_username": "budi_kolektor",
-    "increment_added": 10000000.00,
-    "total_bids_count": 28
-  }
-}
-```
-
-#### 2. Event `TIME_EXTENDED` (Anti-Sniping Aktif)
-```json
-{
-  "event": "TIME_EXTENDED",
-  "data": {
-    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-    "extension_seconds": 30,
-    "new_end_time": "2026-10-25T12:00:30.000Z",
-    "reason": "ANTI_SNIPING_TRIGGERED"
-  }
-}
-```
-
-#### 3. Event `AUCTION_BUYOUT_CLOSED` (Harga Maksimal Tersentuh)
-```json
-{
-  "event": "AUCTION_BUYOUT_CLOSED",
-  "data": {
-    "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
-    "winner_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    "winner_username": "budi_kolektor",
-    "buyout_price": 500000000.00,
-    "closed_reason": "VALUATION_CEILING_REACHED"
-  }
-}
-```
-
-#### 4. Event `AUCTION_CONCLUDED` (Selesai Waktu & Settle)
-```json
-{
-  "event": "AUCTION_CONCLUDED",
-  "data": {
-    "lot_id": "c1f76d22-192a-4c28-8742-1928374aef12",
-    "status": "SETTLED",
-    "winner_id": "8bb30e92-3a52-47d1-ba76-218f2d5f22e1",
-    "winner_username": "andi_collector",
-    "final_price": 310000000.00,
-    "collateral_unfrozen_for_others": true
-  }
-}
-```
-
-#### 5. Event `NEW_LOT_PUBLISHED`
-```json
-{
-  "event": "NEW_LOT_PUBLISHED",
-  "data": {
-    "lot_id": "c1f76d22-192a-4c28-8742-1928374aef12",
-    "title": "Hermès Birkin 25 Togo Gold Hardware",
-    "brand": "Hermès",
+    "id": "c1f76d22-192a-4c28-8742-1928374aef12",
+    "title": "Hermes Birkin 25 Togo Gold Hardware",
     "category": "DESIGNER_BAGS",
-    "starting_price": 250000000.00,
+    "condition_grade": "MINT",
+    "authenticity_guarantee": "Store Receipt 2024, Original Orange Box, Dustbag, CITES cert",
+    "image_base64_compressed": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
     "model_type": "CAPPED",
-    "end_time": "2026-10-25T12:30:00.000Z"
+    "status": "ACTIVE",
+    "min_price": 250000000.00,
+    "current_price": 250000000.00,
+    "max_price": 400000000.00,
+    "start_time": "2026-10-24T12:00:00Z",
+    "end_time": "2026-10-25T12:00:00Z",
+    "anti_sniping_extension_minutes": 2,
+    "created_by": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "created_at": "2026-10-24T12:00:00Z"
   }
 }
 ```
+
+* **Response 400 Bad Request (Invalid Auction Parameters):**
+```json
+{
+  "status": "error",
+  "error": {
+    "code": "ERR_INVALID_AUCTION_PARAMS",
+    "message": "Maximum price must be strictly greater than minimum price, and product image file is required."
+  }
+}
+```
+
+---
+
+## 3. Real-Time Streaming Specification: Server-Sent Events (SSE)
+
+The platform strictly utilizes **Server-Sent Events (SSE)** over persistent HTTP/2 (`text/event-stream`), providing firewall-friendly unidirectional server-to-client streaming with low latency (< 300 ms).
+
+* **Room Lot Stream Endpoint:** `GET /api/v1/sse/auctions/:id`
+* **Global Catalog Stream Endpoint:** `GET /api/v1/sse/catalog`
+* **Server Headers:**
+  - `Content-Type: text/event-stream`
+  - `Cache-Control: no-cache`
+  - `Connection: keep-alive`
+  - `X-Accel-Buffering: no`
+* **Heartbeat Ping:** Server sends comment `: ping\n\n` every 15 seconds.
+* **Auto-Reconnect:** Web client reconnects automatically via native browser `EventSource` with `Last-Event-ID` header.
+
+---
+
+### 3.1 Outbound SSE Broadcast Event Frames
+
+#### 1. Event `PRICE_UPDATED` (New Valid Bid Committed)
+```http
+event: PRICE_UPDATED
+id: 1729782400123
+data: {
+  "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+  "current_price": 360000000.00,
+  "highest_bidder_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "highest_bidder_masked": "Bu***or",
+  "increment_added": 10000000.00,
+  "total_bids_count": 28
+}
+```
+
+#### 2. Event `TIME_EXTENDED` (Velocity Anti-Sniping Triggered)
+```http
+event: TIME_EXTENDED
+id: 1729782415456
+data: {
+  "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+  "extension_minutes": 2,
+  "new_end_time": "2026-10-25T12:02:00.000Z",
+  "reason": "ANTI_SNIPING_TRIGGERED"
+}
+```
+
+#### 3. Event `AUCTION_BUYOUT_CLOSED` (Valuation Ceiling Reached)
+```http
+event: AUCTION_BUYOUT_CLOSED
+id: 1729782420789
+data: {
+  "lot_id": "e0b9b3e1-872b-42e7-91a6-f7615cb38421",
+  "winner_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "winner_masked": "Bu***or",
+  "buyout_price": 500000000.00,
+  "closed_reason": "VALUATION_CEILING_REACHED"
+}
+```
+
+#### 4. Event `AUCTION_CONCLUDED` (Window Expired & Settlement Finished)
+```http
+event: AUCTION_CONCLUDED
+id: 1729782490000
+data: {
+  "lot_id": "c1f76d22-192a-4c28-8742-1928374aef12",
+  "status": "SETTLED",
+  "winner_id": "8bb30e92-3a52-47d1-ba76-218f2d5f22e1",
+  "winner_masked": "An***or",
+  "final_price": 310000000.00,
+  "collateral_unfrozen_for_others": true
+}
+```
+
+#### 5. Event `NEW_LOT_PUBLISHED` (New Lot Active in Catalog)
+```http
+event: NEW_LOT_PUBLISHED
+id: 1729782500000
+data: {
+  "lot_id": "c1f76d22-192a-4c28-8742-1928374aef12",
+  "title": "Hermes Birkin 25 Togo Gold Hardware",
+  "category": "DESIGNER_BAGS",
+  "starting_price": 250000000.00,
+  "model_type": "CAPPED",
+  "end_time": "2026-10-25T12:30:00.000Z"
+}
+```
+
+---
+
+## 4. Document Sign-Off Section
+
+This API Contract Specification (*API Contract Collection & Event Schemas*) has been thoroughly reviewed and formally approved as the definitive technical interface contract between Backend, Frontend Web (Next.js), and System Integrators.
+
+| Role & Responsibility | Signee Name | Status | Date |
+|---|---|:---:|:---:|
+| **Project Manager** | **Geri Setyo Andrian** | `[ APPROVED & SIGNED ]` | 2026-10-24 |
+| **Tech Lead** | **Alini** | `[ APPROVED & SIGNED ]` | 2026-10-24 |
+| **System Analyst** | **Daniel H. S.** | `[ APPROVED & SIGNED ]` | 2026-10-24 |

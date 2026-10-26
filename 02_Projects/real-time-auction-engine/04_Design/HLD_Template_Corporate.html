@@ -444,7 +444,7 @@
 <tr>
 <td>5</td>
 <td><strong>WSS</strong></td>
-<td>WebSocket Secure</td>
+<td>Server-Sent Events (SSE HTTP/2)</td>
 <td>Protokol komunikasi dua arah dupleks penuh terenkripsi TLS untuk streaming data lelang.</td>
 </tr>
 <tr>
@@ -486,7 +486,7 @@
 <tr>
 <td><strong>Mekanisme Penawaran</strong></td>
 <td>HTTP Polling berulang / refresh manual halaman</td>
-<td>Dupleks Penuh WebSocket (&lt; 300 ms latency broadcast)</td>
+<td>Server-Sent Events (SSE) Unidirectional Stream (&lt; 300 ms latency broadcast)</td>
 </tr>
 <tr>
 <td><strong>Kunci Persaingan Saldo</strong></td>
@@ -558,7 +558,7 @@
             LotMod[&quot;Auction Catalog &amp; Lifecycle Module&quot;]
             BidMod[&quot;Bid Execution &amp; Engine Module&quot;]
             WalletMod[&quot;Wallet &amp; Ledger Module&quot;]
-            WSHub[&quot;WebSocket Event Hub Broadcaster&quot;]
+            SSEHub[&quot;Server-Sent Events (SSE) Hub Broadcaster&quot;]
         end
     end
 
@@ -573,7 +573,7 @@
     end
 
     FE_Bidder --&gt;|REST API| APIGW
-    FE_Bidder --&gt;|WebSocket /ws/v1/auctions| WSHub
+    FE_Bidder --&gt;|SSE text/event-stream| SSEHub
     FE_Admin --&gt;|REST API| APIGW
     FE_Bidder -.-&gt;|SSO Authentication| NIRO
     APIGW -.-&gt;|Verify Niro Token| NIRO
@@ -630,7 +630,7 @@
 <tr>
 <td>5</td>
 <td><strong>New</strong></td>
-<td><code>WebSocket Hub</code></td>
+<td><code>SSE Streaming Hub</code></td>
 <td>Penyiaran mutasi harga dan timer ke ribuan klien secara real-time.</td>
 </tr>
 </tbody>
@@ -644,7 +644,7 @@
     participant GW as API Gateway
     participant BE as Golang Bid Engine
     participant Redis as Redis 7 (In-Memory Lua)
-    participant WS as WebSocket Hub
+    participant SSE as SSE Stream Hub
     participant DB as PostgreSQL 16
 
     Bidder-&gt;&gt;UI: Klik Tombol Bid (+Rp 5.000.000)
@@ -656,8 +656,8 @@
     alt Bid Berhasil
         Redis--&gt;&gt;BE: Status OK {new_price, bidder_id, end_time}
         BE-&gt;&gt;Redis: PUBLISH auction:{id}:events {price_update}
-        Redis--&gt;&gt;WS: Message Event
-        WS--&gt;&gt;UI: Broadcast ke Semua Klien (&lt; 300 ms)
+        Redis--&gt;&gt;SSE: Message Event
+        SSE--&gt;&gt;UI: Stream Push ke Semua Klien (&lt; 300 ms)
         BE--&gt;&gt;GW: 200 OK (Bid Accepted)
         GW--&gt;&gt;UI: Response Sukses
         BE-)DB: Asynchronous Persistence ke Tabel bids &amp; wallets
@@ -687,7 +687,7 @@
 <li><code>internal/domain</code>: Entitas inti aturan lelang tanpa dependensi framework.</li>
 <li><code>internal/usecase</code>: Orkestrasi alur bisnis lelang dan dompet.</li>
 <li><code>internal/repository</code>: Implementasi driver PostgreSQL dan Redis Client.</li>
-<li><code>internal/transport</code>: HTTP REST endpoints dan WebSocket Hub.</li>
+<li><code>internal/transport</code>: HTTP REST endpoints dan SSE Streaming Hub.</li>
 </ul>
 <hr>
 <h2>8. Application Interfaces</h2>

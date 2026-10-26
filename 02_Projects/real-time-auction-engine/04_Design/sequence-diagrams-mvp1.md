@@ -132,7 +132,7 @@ sequenceDiagram
     participant API as Golang Bid Handler
     participant Redis as Redis (Lua Engine & State)
     participant DB as PostgreSQL
-    participant WSHub as WebSocket Broadcast Hub
+    participant SSEHub as SSE Broadcast Hub
     actor Observers as Seluruh Peserta Lain
 
     Bidder->>Client: Klik "Place Bid" ($1.200)
@@ -163,9 +163,9 @@ sequenceDiagram
         API->>DB: UPDATE auctions SET current_price=1200, end_time=...
         API->>DB: UPDATE wallets SET locked_balance=...
     and Real-Time Client Push (<300ms SLA)
-        API->>WSHub: Publish Event: BID_ACCEPTED {lot_id, amount: 1200, end_time, time_extended}
-        WSHub-->>Client: WS Push: Event BID_ACCEPTED (Update UI Pemimpin)
-        WSHub-->>Observers: WS Push: Event PRICE_UPDATED (Update Layar Semua Peserta)
+        API->>SSEHub: Ingest Event: BID_ACCEPTED {lot_id, amount: 1200, end_time, time_extended}
+        SSEHub-->>Client: SSE Stream: Event BID_ACCEPTED (Update UI Pemimpin)
+        SSEHub-->>Observers: SSE Stream: Event PRICE_UPDATED (Update Layar Semua Peserta)
     end
 
     API-->>Client: 200 OK {status: "BID_CONFIRMED", current_price: 1200}
@@ -186,7 +186,7 @@ sequenceDiagram
     participant Redis as Redis State
     participant DB as PostgreSQL
     participant SettleSvc as Settlement Engine
-    participant WSHub as WebSocket Broadcast Hub
+    participant SSEHub as SSE Broadcast Hub
     actor Observers as Seluruh Peserta Lain
 
     Bidder->>API: POST /api/v1/auctions/{id}/bids {amount: 5000} (Mencapai Ceiling $5.000)
@@ -198,8 +198,8 @@ sequenceDiagram
     Redis-->>API: Status: BUYOUT_TRIGGERED {winner: user_id, price: 5000}
 
     par Notifikasi Siaran Instan
-        API->>WSHub: Publish Event: AUCTION_BUYOUT_CLOSED {lot_id, winner_id, price: 5000}
-        WSHub-->>Observers: WS Push: Lot Ditutup (Terjual via Instant Buyout)
+        API->>SSEHub: Ingest Event: AUCTION_BUYOUT_CLOSED {lot_id, winner_id, price: 5000}
+        SSEHub-->>Observers: SSE Stream: Lot Ditutup (Terjual via Instant Buyout)
     and Eksekusi Settlement Segera
         API->>SettleSvc: TriggerSettlement(lot_id, winner_id, price=5000)
         SettleSvc->>DB: BEGIN TRANSACTION
@@ -225,7 +225,7 @@ sequenceDiagram
     participant Redis as Redis State
     participant SettleSvc as Settlement Engine
     participant DB as PostgreSQL
-    participant WSHub as WebSocket Broadcast Hub
+    participant SSEHub as SSE Broadcast Hub
     actor Winner as Pemenang Lelang
     actor Losers as Peserta Lain yang Kalah
 
@@ -251,8 +251,8 @@ sequenceDiagram
     end
 
     SettleSvc->>Redis: DEL auction:lot_101 (Bersihkan state lelang aktif)
-    SettleSvc->>WSHub: Publish Event: AUCTION_CONCLUDED {lot_id: 101, winner: user_A, price: 3200}
+    SettleSvc->>SSEHub: Ingest Event: AUCTION_CONCLUDED {lot_id: 101, winner: user_A, price: 3200}
     
-    WSHub-->>Winner: WS Push: Anda memenangkan lot 101! Hak aset telah diterbitkan.
-    WSHub-->>Losers: WS Push: Lot 101 selesai. Seluruh saldo agunan Anda telah dilepas.
+    SSEHub-->>Winner: SSE Stream: Anda memenangkan lot 101! Hak aset telah diterbitkan.
+    SSEHub-->>Losers: SSE Stream: Lot 101 selesai. Seluruh saldo agunan Anda telah dilepas.
 ```

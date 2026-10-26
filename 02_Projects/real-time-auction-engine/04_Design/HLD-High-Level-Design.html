@@ -263,7 +263,7 @@
             CatalogSvc["Catalog & Auction Service\n- Kurasi Barang Mewah\n- Pengaturan Jendela Waktu"]
             ProxyWorker["Proxy Bidding Worker\n- Evaluasi Step Increment Otomatis\n- Resolusi Limit Peserta"]
             SettleDaemon["Settlement Daemon\n- Deteksi Expiry via Redis ZSET\n- Distributed Lock & ACID Ledger"]
-            WSHub["WebSocket Broadcast Hub\n- Multiplexing Channel per Lot\n- Push Latensi Rendah < 300 ms"]
+            SSEHub["Server-Sent Events Broadcast Hub\n- Channel per Lot Streaming\n- Push Latensi Rendah < 300 ms"]
         end
     end
 
@@ -314,7 +314,7 @@
 │   ├── domain/               # Entitas inti lelang, dompet, aturan inkremental, dan model lelang
 │   ├── usecase/              # Logika bisnis (Auth, Bidding, Catalog, Proxy, Settlement)
 │   ├── repository/           # Kontrak interface data dan implementasinya (Postgres &amp; Redis)
-│   └── transport/            # HTTP Handlers (Gin/Echo/Chi) &amp; WebSocket Event Broadcaster
+│   └── transport/            # HTTP Handlers (Gin/Echo/Chi) &amp; SSE Event Broadcaster
 └── pkg/                      # Modul utilitas independen (JWT, Bcrypt, Logger, Rate Limiter)
 </code></pre>
 <hr>

@@ -49,7 +49,7 @@
   - [5.2 [Scenario 2: Fallback / Concurrency Flow]](#52-scenario-2-fallback--concurrency-flow)
 - [6. Application Interfaces & API Contracts](#6-application-interfaces--api-contracts)
   - [6.1 Endpoint Specification](#61-endpoint-specification)
-  - [6.2 WebSocket & Real-Time Events](#62-websocket--real-time-events)
+  - [6.2 Server-Sent Events (SSE) & Real-Time Events](#62-server-sent-events-sse--real-time-events)
 - [7. In-Memory, Caching & Data Structures](#7-in-memory-caching--data-structures)
   - [7.1 In-Memory Atomic Scripts (Lua / Transactions)](#71-in-memory-atomic-scripts-lua--transactions)
   - [7.2 Caching Key Schemas](#72-caching-key-schemas)

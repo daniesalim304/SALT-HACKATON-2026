@@ -238,7 +238,7 @@
 </tr>
 <tr>
 <td><strong>Target Komponen</strong></td>
-<td>Golang Domain, Usecase, Redis Lua Engine, dan WebSocket Hub</td>
+<td>Golang Domain, Usecase, Redis Lua Engine, dan SSE Streaming Hub</td>
 </tr>
 </tbody>
 </table>
@@ -352,7 +352,7 @@ type Auction struct {
 <li>Memeriksa apakah <code>target_bid &gt;= valuation_ceiling</code> (Capped Model). Jika ya, langsung ubah status lot menjadi <code>CLOSED_AWARDED</code>.</li>
 </ul>
 </li>
-<li><strong>Penerbitan Event Real-Time:</strong> Menulis pesan ke Redis Pub/Sub channel <code>channel:auction:events</code> untuk disiarkan oleh WebSocket Hub ke seluruh client dalam &lt; 300 ms.</li>
+<li><strong>Penerbitan Event Real-Time:</strong> Menulis pesan ke Redis Pub/Sub channel <code>channel:auction:events</code> untuk disiarkan oleh SSE Hub ke seluruh client dalam &lt; 300 ms.</li>
 <li><strong>Persistensi Asinkron:</strong> Menyimpan riwayat penawaran ke tabel PostgreSQL <code>bids</code>.</li>
 </ol>
 <h3>2.2 SettleUsecase: Automatic Expiry Settlement</h3>
@@ -368,13 +368,13 @@ type Auction struct {
 <li>Pastikan seluruh agunan peserta lain berstatus 0 locked.</li>
 </ul>
 </li>
-<li>Menghapus key lelang aktif dari Redis dan memancarkan event <code>AUCTION_CONCLUDED</code> via WebSocket.</li>
+<li>Menghapus key lelang aktif dari Redis dan memancarkan event <code>AUCTION_CONCLUDED</code> via SSE.</li>
 </ol>
 <hr>
-<h2>3. Desain Komponen WebSocket Hub</h2>
-<p>WebSocket Hub bertugas mempertahankan ribuan koneksi persisten peserta dan mendistribusikan pembaruan harga secara non-blocking:</p>
+<h2>3. Desain Komponen Server-Sent Events (SSE) Streaming Hub</h2>
+<p>SSE Streaming Hub bertugas mempertahankan ribuan koneksi HTTP/2 persisten peserta dan mendistribusikan pembaruan harga secara non-blocking:</p>
 <div class="mermaid-wrapper"><div class="mermaid">flowchart LR
-    subgraph Hub_Internals ["WebSocket Hub (Golang)"]
+    subgraph Hub_Internals ["SSE Streaming Hub (Golang)"]
         Register["Register Channel (Koneksi Baru)"]
         Unregister["Unregister Channel (Koneksi Terputus)"]
         Broadcast["Broadcast Channel (Event Inbound)"]
@@ -485,7 +485,7 @@ type Auction struct {
 <td><code>WS</code></td>
 <td><code>/api/v1/ws/auctions</code></td>
 <td>Universal</td>
-<td>Jalur koneksi real-time WebSocket yang dipantau oleh Bidder, AM, dan Superadmin.</td>
+<td>Jalur streaming real-time Server-Sent Events (SSE) yang dipantau oleh Bidder, AM, dan Superadmin.</td>
 </tr>
 </tbody>
 </table>

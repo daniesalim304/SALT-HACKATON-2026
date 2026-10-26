@@ -87,7 +87,7 @@ graph TD
   - **Zona Pemicu (*Trigger Window*):** Aktif pada **2 menit terakhir** sebelum jadwal lelang berakhir (`sisa_waktu <= 120 detik`).
   - **Pengecekan Kepadatan Trafik (*Velocity Threshold*):** Sistem memantau frekuensi penawaran setiap detik. Jika terjadi lonjakan **$\ge$ 10 penawaran dalam 1 detik (*10 hits/second*)**, sistem menganggap terjadi perang tawar-menawar intensif dan langsung memicu perpanjangan waktu (*instant dynamic extension*).
   - **Besaran Waktu Perpanjangan (*Extension Duration*):** Ditentukan secara fleksibel oleh Auction Manager pada saat **membuat listing lot lelang** (`anti_sniping_extension_minutes`), bersifat opsional dengan pilihan berapa menit tambahan (misal: +1 menit, +2 menit, atau +5 menit). Jika lot tidak mengaktifkan perpanjangan waktu, maka waktu tidak bertambah.
-  - **Sinkronisasi Instan:** Begitu terpicu, waktu akhir lelang yang baru langsung disiarkan ke seluruh pengamat melalui WebSocket event `TIME_EXTENDED`.
+  - **Sinkronisasi Instan:** Begitu terpicu, waktu akhir lelang yang baru langsung disiarkan ke seluruh pengamat melalui Server-Sent Events (SSE) event `TIME_EXTENDED`.
 
 ### MOD-06: Automated Proxy Bidding Worker
 * **Fungsi:** Menjalankan penawaran otomatis atas nama peserta hingga batas limit pribadi.

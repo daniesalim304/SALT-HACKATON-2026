@@ -20,7 +20,7 @@ Untuk memenuhi kebutuhan performa **SLA < 300 ms** dan jaminan integritas transa
    - Serialisasi penawaran lelang secara instan via Redis Lua Scripts.
    - Penyimpanan status hitung mundur waktu (*dynamic expiration timer*).
    - Penguncian agunan sementara (*fast balance reservation*).
-   - Redis Pub/Sub untuk mendistribusikan event ke WebSocket Hub.
+   - Redis Pub/Sub untuk mendistribusikan event ke Server-Sent Events (SSE) Streaming Hub.
 2. **PostgreSQL 16 (Authoritative Ledger & Audit Trail):**
    - Penyimpanan permanen profil pengguna, kepemilikan aset, dan riwayat penawaran (*immutable bids*).
    - Double-entry ledger untuk memastikan audit keuangan tidak bisa dimanipulasi (*tamper-proof balance history*).

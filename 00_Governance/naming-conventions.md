@@ -29,7 +29,7 @@ To maintain end-to-end traceability across systems, use stable sequential prefix
 | Functional Requirement | `FR-XXX` | `FR-001: User Collateral Lock` |
 | Non-Functional Requirement | `NFR-XXX` | `NFR-001: Sub-300ms Bid Latency` |
 | Business Rule | `BR-XXX` | `BR-001: Minimum Bid Increment` |
-| Integration Requirement | `IR-XXX` | `IR-001: WebSocket Bid Distribution` |
+| Integration Requirement | `IR-XXX` | `IR-001: SSE Bid Distribution` |
 | Data Requirement | `DR-XXX` | `DR-001: Immutable Bid Audit Log` |
 | Architecture Decision | `ADR-XXX` | `ADR-001: Go Sync vs Redis Mutex` |
 | Clarification Question / Gap | `GAP-XXX` / `Q-XXX` | `GAP-001: Anti-Sniping Window Duration` |

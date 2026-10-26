@@ -79,7 +79,7 @@ Dokumen High-Level Design (HLD) ini menyajikan cetak biru arsitektur menyeluruh 
 | 2 | **SLA** | Service Level Agreement | Standar performa latensi sistem (sinkronisasi data penawaran < 300 ms). |
 | 3 | **BLOB** | Binary Large Object | Format penyimpanan data biner mentah gambar lot lelang pada kolom `BYTEA` PostgreSQL. |
 | 4 | **ACID** | Atomicity, Consistency, Isolation, Durability | Kepatuhan transaksi database relasional pada mutasi saldo dan status aset. |
-| 5 | **WSS** | WebSocket Secure | Protokol komunikasi dua arah dupleks penuh terenkripsi TLS untuk streaming data lelang. |
+| 5 | **SSE** | Server-Sent Events | Protokol streaming data satu arah berbasis HTTP/2 persisten (`text/event-stream`) untuk pembaruan harga lelang dengan latensi < 300 ms. |
 | 6 | **AM** | Auction Manager | Pengelola kurasi lot, pembuatan katalog barang mewah, dan monitoring event lelang. |
 
 ### 3.3 Objective Overview
@@ -105,7 +105,7 @@ Sebagai platform lelang barang mewah modern, keandalan sistem bergantung pada pe
 
 | Karakteristik | Kondisi Umum (As-Is / Legacy) | Solusi Platform (To-Be Architecture) |
 |---|---|---|
-| **Mekanisme Penawaran** | HTTP Polling berulang / refresh manual halaman | Dupleks Penuh WebSocket (< 300 ms latency broadcast) |
+| **Mekanisme Penawaran** | HTTP Polling berulang / refresh manual halaman | Server-Sent Events (SSE) Unidirectional Stream (< 300 ms latency broadcast) |
 | **Kunci Persaingan Saldo** | Table-lock / Row-lock PostgreSQL lambat | In-Memory Mutex Atomic via Redis Lua Scripting (< 5 ms) |
 | **Validasi Agunan** | Saldo mengendap pasif kaku di awal pendaftaran | Penahanan dinamis per penawaran lelang yang aktif |
 | **Penyimpanan Media** | Bergantung pada object storage cloud eksternal | Terkapsulasi aman di Postgres BLOB (`BYTEA`), disajikan dalam Base64 terkompresi |
@@ -166,7 +166,7 @@ flowchart TD
             LotMod["Auction Catalog & Lifecycle Module"]
             BidMod["Bid Execution & Engine Module"]
             WalletMod["Wallet & Ledger Module"]
-            WSHub["WebSocket Event Hub Broadcaster"]
+            SSEHub["Server-Sent Events (SSE) Hub Broadcaster"]
         end
     end
 
@@ -181,7 +181,7 @@ flowchart TD
     end
 
     FE_Bidder -->|REST API| APIGW
-    FE_Bidder -->|WebSocket /ws/v1/auctions| WSHub
+    FE_Bidder -->|SSE text/event-stream| SSEHub
     FE_Admin -->|REST API| APIGW
     FE_Bidder -.->|SSO Authentication| NIRO
     APIGW -.->|Verify Niro Token| NIRO
@@ -194,7 +194,7 @@ flowchart TD
     BidMod -->|EVALSHA Atomic Execution| LuaEngine
     LuaEngine --> RedisState
     LuaEngine -->|Publish Event| RedisPubSub
-    RedisPubSub -->|Subscribe| WSHub
+    RedisPubSub -->|Subscribe| SSEHub
 
     LotMod --> PostgresDB
     WalletMod --> PostgresDB
@@ -208,7 +208,7 @@ flowchart TD
 | 2 | **New** | `Bid Engine (Lua)` | Eksekusi transaksi penawaran atomik < 5 ms pada Redis memory tier. |
 | 3 | **New** | `Auction Catalog` | Pengelolaan data lot, upload gambar format biner multipart ke PostgreSQL BLOB, dan konversi output Base64 terkompresi. |
 | 4 | **New** | `Settlement Daemon`| Background service yang memantau expiry lot melalui Redis ZSET dan mengeksekusi settlement ACID. |
-| 5 | **New** | `WebSocket Hub` | Penyiaran mutasi harga dan timer ke ribuan klien secara real-time. |
+| 5 | **New** | `SSE Streaming Hub` | Penyiaran mutasi harga dan timer ke ribuan klien secara real-time via Server-Sent Events. |
 
 ### 6.3 High-Level Sequence Diagrams
 Alur penawaran atomik berkecepatan tinggi dapat dilihat pada diagram berikut:
@@ -221,7 +221,7 @@ sequenceDiagram
     participant GW as API Gateway
     participant BE as Golang Bid Engine
     participant Redis as Redis 7 (In-Memory Lua)
-    participant WS as WebSocket Hub
+    participant SSE as SSE Stream Hub
     participant DB as PostgreSQL 16
 
     Bidder->>UI: Klik Tombol Bid (+Rp 5.000.000)
@@ -233,8 +233,8 @@ sequenceDiagram
     alt Bid Berhasil
         Redis-->>BE: Status OK {new_price, bidder_id, end_time}
         BE->>Redis: PUBLISH auction:{id}:events {price_update}
-        Redis-->>WS: Message Event
-        WS-->>UI: Broadcast ke Semua Klien (< 300 ms)
+        Redis-->>SSE: Message Event
+        SSE-->>UI: Stream Push ke Semua Klien (< 300 ms)
         BE-->>GW: 200 OK (Bid Accepted)
         GW-->>UI: Response Sukses
         BE-)DB: Asynchronous Persistence ke Tabel bids & wallets
@@ -264,7 +264,7 @@ Pemisahan kode mengikuti standar arsitektur bersih:
 - `internal/domain`: Entitas inti aturan lelang tanpa dependensi framework.
 - `internal/usecase`: Orkestrasi alur bisnis lelang dan dompet.
 - `internal/repository`: Implementasi driver PostgreSQL dan Redis Client.
-- `internal/transport`: HTTP REST endpoints dan WebSocket Hub.
+- `internal/transport`: HTTP REST endpoints dan SSE Streaming Hub.
 
 ---
 
